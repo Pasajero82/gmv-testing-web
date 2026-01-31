@@ -298,9 +298,18 @@
         }
 
 	.info-content {
-            padding: 20px;
-            height: 250px; /* Altura fija para que el scroll funcione */
-            overflow-y: auto; /* Permite deslizar hacia abajo para ver todos los logros */
+            padding: 15px 20px;
+            height: 280px; /* Altura fija para que el scroll funcione */
+            overflow-y: scroll; /* Permite deslizar hacia abajo para ver todos los logros */
+	    -webkit-overflow-scrolling: touch;
+        }
+	/* 2. EL ESTILO DE LA BARRA (Lo que la hace visible) */
+        .info-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .info-content::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
         }
 
         .tab-pane {
