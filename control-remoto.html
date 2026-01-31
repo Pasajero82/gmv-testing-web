@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GMV REMOTE ELITE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff0055;
+            --neon-cyan: #00ccff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: #000;
+            background-image: radial-gradient(circle at 50% 50%, #1a0a1a 0%, #000 100%);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 20px;
+            overflow: hidden;
+        }
+
+        /* STATUS PILL */
+        .status-bar {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+        .connected { color: var(--neon-cyan); border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 204, 255, 0.2); }
+
+        /* NAV PAD (DISEÑO CIRCULAR) */
+        .nav-section {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-btn svg { width: 30px; height: 30px; fill: currentColor; }
+
+        /* BOTÓN CENTRAL PLAY/PAUSE */
+        .master-btn {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: #000;
+            border: 3px solid var(--neon-pink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.4);
+            z-index: 10;
+        }
+
+        .master-btn svg { fill: var(--neon-pink); width: 35px; }
+
+        /* GRID 3X3 (FUNCIÓN DE TECLAS) */
+        .function-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .f-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            aspect-ratio: 1/1;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .f-btn svg { width: 24px; height: 24px; fill: #fff; margin-bottom: 5px; opacity: 0.8; }
+        .f-btn .key-num { font-size: 0.6rem; color: rgba(255,255,255,0.3); }
+
+        /* ACTIVE STATES */
+        .control-btn:active, .f-btn:active {
+            background: var(--neon-cyan);
+            color: #000;
+            transform: scale(0.92);
+        }
+        .master-btn:active {
+            transform: scale(0.9);
+            background: var(--neon-pink);
+        }
+        .master-btn:active svg { fill: #fff; }
+
+        .f-btn.fav:active { background: var(--neon-pink); }
+	.esc-btn { 
+            position: absolute; 
+            top: 25px; 
+            right: 25px; 
+            width: 40px; 
+            height: 40px; 
+            background: rgba(255, 0, 85, 0.1); 
+            border: 1px solid var(--pink); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 100;
+        }
+        .esc-btn svg { width: 20px; fill: var(--pink); }
+        .esc-btn:active { background: var(--pink); }
+        .esc-btn:active svg { fill: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <div id="status" class="status-bar">CONNECTING...</div>
+
+    <button class="esc-btn" onclick="send('esc')">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+
+    <div class="nav-section">
+        <div class="d-pad">
+            <div></div>
+            <button class="control-btn" onclick="send('vol-up')">
+                <svg viewBox="0 0 24 24"><path d="M14 5v14l-7-5H3V10h4l7-5zm3 7c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            </button>
+            <div></div>
+            
+            <button class="control-btn" onclick="send('prev')">
+                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6L19 18V6z"/></svg>
+            </button>
+            <div></div> <button class="control-btn" onclick="send('next')">
+                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+            
+            <div></div>
+            <button class="control-btn" onclick="send('vol-down')">
+                <svg viewBox="0 0 24 24"><path d="M11 9l-4 4H3v6h4l4 4V9zm5.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            </button>
+            <div></div>
+        </div>
+        <button class="master-btn" onclick="send('pause')">
+            <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+    </div>
+
+    <div class="function-grid">
+        <button class="f-btn" onclick="send('clean')">
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <span class="key-num">1</span>
+        </button>
+        <button class="f-btn" onclick="send('stats')">
+            <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+            <span class="key-num">2</span>
+        </button>
+        <button class="f-btn" onclick="send('achievements')">
+            <svg viewBox="0 0 24 24"><path d="M18 2H6v2H4v7c0 3.31 2.69 6 6 6v2H8v2h8v-2h-2v-2c3.31 0 6-2.69 6-6V4h-2V2zM6 11V6h2v5c0 1.1.9 2 2 2v-9h4v9c1.1 0 2-.9 2-2V6h2v5c0 2.21-1.79 4-4 4h-4c-2.21 0-4-1.79-4-4z"/></svg>
+            <span class="key-num">3</span>
+        </button>
+        
+        <button class="f-btn" onclick="send('share')">
+            <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+            <span class="key-num">4</span>
+        </button>
+        <button class="f-btn fav" onclick="send('favorite')">
+            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            <span class="key-num">5</span>
+        </button>
+        <button class="f-btn" onclick="send('fav-menu')">
+            <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2 10H6v-2h12v2zm0-4H6V10h12v2z"/></svg>
+            <span class="key-num">6</span>
+        </button>
+        
+        <button class="f-btn" onclick="send('muro')">
+            <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+            <span class="key-num">7</span>
+        </button>
+        <button class="f-btn" onclick="send('marquee')">
+            <svg viewBox="0 0 24 24"><path d="M7 15h10v2H7zm0-4h10v2H7zm0-4h10v2H7z"/></svg>
+            <span class="key-num">8</span>
+        </button>
+        <button class="f-btn" onclick="send('rewards')">
+            <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.65-.5-.65C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM15 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM20 19H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.41 12.25 12 8.66l3.59 3.59L17 10.83 14.92 8H20v6z"/></svg>
+            <span class="key-num">9</span>
+        </button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomID = urlParams.get('room');
+
+        if (roomID) {
+            socket.emit('join-room', roomID);
+        }
+
+        function send(cmd) {
+            socket.emit('enviar-comando', {
+                cmd: cmd,
+                room: roomID,
+                time: Date.now()
+            });
+            // Feedback háptico profesional
+            if (navigator.vibrate) navigator.vibrate(35);
+        }
+
+        socket.on('connect', () => {
+            const el = document.getElementById('status');
+            el.className = 'status-bar connected';
+            el.innerText = 'ONLINE : ' + roomID;
+        });
+
+        socket.on('disconnect', () => {
+            const el = document.getElementById('status');
+            el.className = 'status-bar';
+            el.innerText = 'OFFLINE';
+        });
+    </script>
+</body>
+</html>
