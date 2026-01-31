@@ -3142,12 +3142,20 @@ document.addEventListener('DOMContentLoaded', function() {
         function playSpecificVideo(video, addToHistory) {      
 			currentVideo = video;
 			// ENVIAR SEÑAL AL CELULAR CON EL NOMBRE DE LA CANCIÓN
-    socket.emit('enviar-comando', { 
-        cmd: 'update-track', 
-        title: video.title, 
-        artist: video.artist, 
-        room: myRoom 
-    });
+		// Calcular tiempo formateado para el celular
+                const hours = Math.floor(statsData.totalMinutes / 60);
+                const mins = statsData.totalMinutes % 60;
+                const timeStr = `${hours}h ${mins}m`;
+
+                socket.emit('enviar-comando', {
+                    cmd: 'update-user-data',
+                    username: username.toUpperCase(),
+                    level: onlyLevelName.toUpperCase(),
+                    totalVideos: statsData.totalVideos,
+                    watchTime: timeStr,
+                    room: myRoom
+                });
+
  		        if (viewTimer) clearTimeout(viewTimer);
             lastPlayedMusicId = video.id;
             checkNightOwl();
