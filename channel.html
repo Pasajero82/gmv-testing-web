@@ -237,26 +237,36 @@
         }
 
         /* TOP FAVORITES BUTTON ENHANCED */
-        .fav-menu-btn-top {
-            position: absolute; 
-            top: 0; 
-            right: 0; 
-            height: 55px; 
-            background: rgba(0,0,0,0.95);
-            color: #00ccff; 
-            cursor: pointer; 
-            padding: 0 30px; 
-            display: flex; 
-            align-items: center;
-            font-family: 'Montserrat', sans-serif; 
-            font-size: 0.8rem; 
-            font-weight: bold;
-            text-transform: uppercase; 
-            z-index: 65; 
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border-left: 2px solid transparent;
-            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
-        }
+.top-buttons-group {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    height: 55px;
+    z-index: 65;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.fav-menu-btn-top, .qr-btn-top {
+    height: 55px;
+    background: rgba(0,0,0,0.95);
+    color: #00ccff;
+    cursor: pointer;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid rgba(255, 0, 85, 0.2);
+}
+
+.qr-btn-top svg {
+    fill: #00ccff;
+    width: 24px;
+}
+
+.top-buttons-group.minimized {
+    transform: translateY(-100%);
+}
 	 /* ESTADO OCULTO DEL BOTÓN FAVORITOS (Se va hacia arriba) */
         .fav-menu-btn-top.minimized {
             transform: translateY(-100%); /* Sube y desaparece */
@@ -1648,10 +1658,15 @@
         <div class="vignette"></div>
         <div class="scanlines"></div>
         <div class="crt-effect"></div>
-        <div class="marquee-container" id="tickerBar">
-	            <div class="marquee-content" id="newsTicker"></div>
-            <div class="fav-menu-btn-top" onclick="toggleFavMenu()">★ FAVORITES</div>
+	<div class="marquee-container" id="tickerBar">
+    <div class="marquee-content" id="newsTicker"></div>
+    <div class="top-buttons-group">
+        <div class="qr-btn-top" onclick="toggleQRDesdeIcono()" title="Mostrar QR">
+            <svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2 2h2v2h-2v-2zM13 15h2v2h-2v-2zm2 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2 2h2v2h-2v-2z"/></svg>
         </div>
+        <div class="fav-menu-btn-top" onclick="toggleFavMenu()">★</div>
+    </div>
+</div>
 
         <div id="promoCard" class="promo-card">
             <img src="" alt="Promo" id="promoImage" class="promo-image">
@@ -3126,6 +3141,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function playSpecificVideo(video, addToHistory) {      
 			currentVideo = video;
+			// ENVIAR SEÑAL AL CELULAR CON EL NOMBRE DE LA CANCIÓN
+    socket.emit('enviar-comando', { 
+        cmd: 'update-track', 
+        title: video.title, 
+        artist: video.artist, 
+        room: myRoom 
+    });
  		        if (viewTimer) clearTimeout(viewTimer);
             lastPlayedMusicId = video.id;
             checkNightOwl();

@@ -673,6 +673,17 @@
             event.target.classList.add('active');
             document.getElementById('tab-' + tab).classList.add('active');
         }
+	// ESCUCHAR EL NOMBRE QUE MANDA LA TV
+        socket.on('ejecutar-comando', (data) => {
+            if (data.cmd === 'update-track') {
+                const trackDisplay = document.getElementById('current-track-name');
+                if (trackDisplay) {
+                    // Combinamos Artista y Título en mayúsculas
+                    trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
