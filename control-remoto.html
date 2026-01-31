@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GMV REMOTE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { 
             margin: 0; 
@@ -403,20 +403,37 @@
         }
 
 	/* 1. Contenedor de la canción (Entre Status y D-pad) */
+/* CONTENEDOR DE LA MARQUESINA */
 .now-playing-info {
     width: 100%;
-    margin: 0 0 20px 0; 
-    text-align: center;
-    min-height: 20px;
+    margin: 0 0 20px 0;
+    padding: 5px 0;
+    background: rgba(0, 0, 0, 0.3); /* Fondo un poco más oscuro para la "pantalla" */
+    border-radius: 5px;
+    overflow: hidden; /* Corta el texto que se sale del ancho */
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
+/* TEXTO LED CON ANIMACIÓN */
 #current-track-name {
-    font-size: 0.7rem;
+    display: inline-block;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 1.5rem; /* El doble de lo anterior (era 0.7rem) */
     color: #00ccff;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-weight: 700;
-    text-shadow: 0 0 10px rgba(0, 204, 255, 0.4);
+    padding-left: 100%; /* Empieza fuera de la pantalla a la derecha */
+    animation: marquee-led 10s linear infinite; /* Movimiento continuo */
+    text-shadow: 0 0 8px rgba(0, 204, 255, 0.6);
+}
+
+/* LA ANIMACIÓN DE MOVIMIENTO */
+@keyframes marquee-led {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
 }
 
 /* 2. Rediseño del botón ESC (Pequeño y elegante) */
