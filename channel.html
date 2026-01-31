@@ -3627,7 +3627,7 @@ socket.on('ejecutar-comando', (data) => {
                 const levelInfo = calculateLevel(statsData.permanentAchievements);
                 const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
                 
-                // Cálculo de tiempo para el envío inicial
+                // Cálculo de tiempo para el envío
                 const hSync = Math.floor(statsData.totalMinutes / 60);
                 const mSync = statsData.totalMinutes % 60;
                 const timeStrSync = `${hSync}h ${mSync}m`;
