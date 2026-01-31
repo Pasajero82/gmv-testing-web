@@ -686,8 +686,7 @@
 	// NUEVO: Pedir a la PC que nos mande la canción actual de inmediato
         send('sync'); 
     });
-    });
-
+    
     socket.on('disconnect', () => {
         document.getElementById('status').className = 'status';
         document.getElementById('status').innerText = 'OFFLINE';
