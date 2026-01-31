@@ -3570,26 +3570,14 @@ const qrURL = `https://soloparapruebas.netlify.app/control-remoto.html?room=${my
         }
     });
 
-    // Asegurar unión a sala y sincronización
+// --- RECEPTOR DE SEÑAL Y COMANDOS (BLOQUE CORREGIDO) ---
+
+// 1. Manejo de conexión y sincronización inicial
 socket.on('connect', () => {
-    console.log("📡 PC conectada. Uniéndose a:", myRoom);
-    // RECONEXIÓN AUTOMÁTICA Y UNIÓN A SALA
-socket.on('connect', () => {
-    console.log("📡 Conexión establecida con Render. Uniéndose a sala:", myRoom);
+    console.log("📡 SIGNAL ESTABLISHED - ID:", socket.id);
     socket.emit('join-room', myRoom);
     
-    // Al conectar, avisamos qué suena por si hay un celular esperando
-    if (currentVideo) {
-        socket.emit('enviar-comando', { 
-            cmd: 'update-track', 
-            title: currentVideo.title, 
-            artist: currentVideo.artist, 
-            room: myRoom 
-        });
-    }
-});
-    
-    // Si ya hay un video sonando, lo mandamos de inmediato
+    // Enviamos la canción actual al control en cuanto conecte
     if (currentVideo) {
         socket.emit('enviar-comando', { 
             cmd: 'update-track', 
@@ -3600,10 +3588,11 @@ socket.on('connect', () => {
     }
 });
 
+// 2. Escucha de comandos del control remoto
 socket.on('ejecutar-comando', (data) => {
-    console.log('📡 Orden:', data.cmd);
+    console.log('📩 Orden recibida:', data.cmd);
     switch(data.cmd) {
-	case 'sync':
+        case 'sync':
             if (currentVideo) {
                 socket.emit('enviar-comando', { 
                     cmd: 'update-track', 
@@ -3612,7 +3601,8 @@ socket.on('ejecutar-comando', (data) => {
                     room: myRoom 
                 });
             }
-        break;
+            break;
+            
         case 'next': nextChannel(); break;
         case 'prev': previousChannel(); break;
         case 'pause': togglePause(); break;
@@ -3622,20 +3612,16 @@ socket.on('ejecutar-comando', (data) => {
         case 'stats': toggleStatsPanel(); break;
         case 'achievements': toggleAchievementsPanel(); break;
         case 'minimize': {
-    // Buscamos la barra de abajo
-    const bar = document.getElementById('controlsBar');
-    if (bar) bar.classList.toggle('minimized');
-
-    // Buscamos el botón de favoritos de arriba
-    const favBtnTop = document.querySelector('.fav-menu-btn-top');
-    if (favBtnTop) favBtnTop.classList.toggle('minimized');
-    break;
-}
+            const bar = document.getElementById('controlsBar');
+            if (bar) bar.classList.toggle('minimized');
+            const favBtnTop = document.querySelector('.fav-menu-btn-top');
+            if (favBtnTop) favBtnTop.classList.toggle('minimized');
+            break;
+        }
         case 'share': openShareMenu(); break;
         case 'fav-menu': toggleFavMenu(); break;
         case 'marquee': toggleMarqueeContent(); break;
         case 'rewards': toggleRewardsSidebar(); break;
-        
         case 'muro': {
             const ovMuro = document.getElementById('signal-input-overlay');
             const fiMuro = document.getElementById('signal-input-field');
@@ -3648,24 +3634,19 @@ socket.on('ejecutar-comando', (data) => {
             }
             break;
         }
-
         case 'muro-broadcast':
-            // Recibe el texto directamente del celular y activa la inyección al Excel y al muro
-            if (data.texto) {
-                sendSignalToWall(data.texto); 
-            }
+            if (data.texto) sendSignalToWall(data.texto); 
             break;
-
         case 'esc': 
             closeShareMenu(); 
             closeSignalOverlay(); 
-            // Esta línea mata el QR desde el celular:
             if (document.getElementById('qr-overlay')) {
                 document.getElementById('qr-overlay').style.display = 'none';
             }
             break;
     }
 });
+
 </script>
 <div id="sys-notification" class="sys-msg hidden">🔓 SYSTEM OVERRIDE: ACCESS GRANTED</div>
 
