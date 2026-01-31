@@ -1811,7 +1811,7 @@
     
     <script>
         // 1. Iniciamos la conexión y sala una sola vez
-        const socket = io();
+        const socket = io('https://gmv-server.onrender.com');
         const myRoom = "GMV-" + Math.random().toString(36).substring(2, 6).toUpperCase();
 
         // 2. Esperar a que se carguen los videos antes de iniciar

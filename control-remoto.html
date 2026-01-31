@@ -226,7 +226,7 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        const socket = io('https://gmv-server.onrender.com');
         const urlParams = new URLSearchParams(window.location.search);
         const roomID = urlParams.get('room');
 
