@@ -3577,6 +3577,11 @@ const qrURL = `https://soloparapruebas.netlify.app/control-remoto.html?room=${my
         setTimeout(() => fiMuro.focus(), 50);
     }
     break;
+
+		case 'muro-broadcast':
+    // Esta función ya la tienes en tu channel.html, solo la llamamos con el texto del celular
+    sendSignalToWall(data.texto); 
+    break;
 		case 'esc': 
                 closeShareMenu(); 
                 closeSignalOverlay(); 
