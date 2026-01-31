@@ -3167,6 +3167,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: onlyLevelName.toUpperCase(),
                 totalVideos: statsData.totalVideos,
                 watchTime: timeStr,
+		streak: statsData.currentStreak,
                 room: myRoom
             });
 
@@ -3638,6 +3639,7 @@ socket.on('ejecutar-comando', (data) => {
                     level: onlyLevelName.toUpperCase(),
                     totalVideos: statsData.totalVideos,
                     watchTime: timeStrSync,
+		    streak: statsData.currentStreak,
                     room: myRoom
                 });
             }
