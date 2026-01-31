@@ -50,12 +50,11 @@
             max-width: 340px;
             background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
             border-radius: 35px;
-            padding: 60px 25px 25px;
-            box-shadow: 
-                0 20px 60px rgba(0,0,0,0.6),
-                inset 0 1px 0 rgba(255,255,255,0.05);
-            margin-bottom: 20px;
-        }
+            margin-top: 60px; 
+    	    padding: 25px 25px 25px; 
+    	    box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    	    margin-bottom: 20px;
+}
 
         /* D-PAD SECTION */
         .dpad-container {
@@ -406,9 +405,9 @@
 	/* 1. Contenedor de la canción (Entre Status y D-pad) */
 .now-playing-info {
     width: 100%;
-    margin: 20px 0 10px;
+    margin: 0 0 20px 0; 
     text-align: center;
-    min-height: 40px;
+    min-height: 20px;
 }
 
 #current-track-name {
@@ -451,11 +450,11 @@
 
     <div id="status" class="status">CONNECTING...</div>
 
-<div class="now-playing-info">
+<div class="remote">
+	<div class="now-playing-info">
     <div id="current-track-name">NO SIGNAL DETECTED</div>
 </div>
 
-<div class="remote">
     <div class="dpad-container">
         <div class="dpad-bg"></div>
         
