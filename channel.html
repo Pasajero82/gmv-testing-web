@@ -3612,7 +3612,7 @@ socket.on('connect', () => {
 socket.on('ejecutar-comando', (data) => {
     console.log('📩 Orden recibida:', data.cmd);
     switch(data.cmd) {
-       case 'sync':
+	case 'sync':
             if (currentVideo) {
                 // 1. Mandar la canción actual para la marquesina
                 socket.emit('enviar-comando', { 
@@ -3622,16 +3622,22 @@ socket.on('ejecutar-comando', (data) => {
                     room: myRoom 
                 });
 
-                // 2. Extraer datos reales y mandarlos al celular
-		const username = localStorage.getItem('gmv_username') || 'GUEST';
+                // 2. Extraer datos, calcular tiempo y mandar todo al celular
+                const username = localStorage.getItem('gmv_username') || 'GUEST';
                 const levelInfo = calculateLevel(statsData.permanentAchievements);
-                // Extraemos solo el nombre del nivel (ej. "Newbie")
                 const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
+                
+                // Cálculo de tiempo para el envío inicial
+                const hSync = Math.floor(statsData.totalMinutes / 60);
+                const mSync = statsData.totalMinutes % 60;
+                const timeStrSync = `${hSync}h ${mSync}m`;
 
                 socket.emit('enviar-comando', {
                     cmd: 'update-user-data',
                     username: username.toUpperCase(),
                     level: onlyLevelName.toUpperCase(),
+                    totalVideos: statsData.totalVideos,
+                    watchTime: timeStrSync,
                     room: myRoom
                 });
             }
