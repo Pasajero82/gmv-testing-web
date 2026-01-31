@@ -733,19 +733,36 @@
 
         // RECEPTOR DE LA CANCIÓN
         socket.on('ejecutar-comando', (data) => {
-	// --- RECEPTOR DE USUARIO Y STATS ---
+	// --- RECEPTOR DE USUARIO, STATS Y LOGROS (CORREGIDO) ---
         if (data.cmd === 'update-user-data') {
             const userEl = document.getElementById('remote-username');
-            const levelEl = document.getElementById('remote-level');
+            const levelTopEl = document.getElementById('remote-level');
             const videosEl = document.getElementById('remote-videos');
             const timeEl = document.getElementById('remote-time');
+            const streakEl = document.getElementById('remote-streak');
+            const levelStatsEl = document.getElementById('remote-level-stats');
+            const achListEl = document.getElementById('remote-achievements-list');
 
             if (userEl) userEl.innerText = data.username;
-            if (levelEl) levelEl.innerText = "[" + data.level + "]";
+            if (levelTopEl) levelTopEl.innerText = "[" + data.level + "]";
             if (videosEl) videosEl.innerText = data.totalVideos;
             if (timeEl) timeEl.innerText = data.watchTime;
-	    if (streakEl) streakEl.innerText = data.streak + " days";
+            if (streakEl) streakEl.innerText = data.streak + " days";
             if (levelStatsEl) levelStatsEl.innerText = data.level;
+
+            // DIBUJAR LOGROS DINÁMICAMENTE
+            if (achListEl && data.achievements) {
+                achListEl.innerHTML = ''; // Limpiar "Waiting for data..."
+                data.achievements.forEach(ach => {
+                    const item = document.createElement('div');
+                    item.className = 'stat-item';
+                    item.innerHTML = `
+                        <span class="stat-label">${ach.icon} ${ach.name}</span>
+                        <span class="stat-value">${ach.unlocked ? '✓' : '🔒'}</span>
+                    `;
+                    achListEl.appendChild(item);
+                });
+            }
             return;
         }
 
