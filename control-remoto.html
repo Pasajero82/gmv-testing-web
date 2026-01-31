@@ -634,87 +634,89 @@
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-    const socket = io('https://gmv-server.onrender.com');
-    const urlParams = new URLSearchParams(window.location.search);
-    let roomID = urlParams.get('room');
+    <script>
+        const socket = io('https://gmv-server.onrender.com');
+        const urlParams = new URLSearchParams(window.location.search);
+        let roomID = urlParams.get('room');
 
-    // SI EL ROOM ES NULL, INTENTAR RECUPERARLO O AVISAR
-    if (!roomID) {
-        console.error("⚠️ CRITICAL: No Room ID found in URL!");
-        document.getElementById('status').innerText = 'ERROR: NO ROOM';
-    } else {
-        socket.emit('join-room', roomID);
-    }
-
-    function send(cmd) {
-        if (!roomID) return;
-        socket.emit('enviar-comando', { cmd, room: roomID, time: Date.now() });
-        if (navigator.vibrate) navigator.vibrate(35);
-    }
-
-    function openKeyboard() {
-        document.getElementById('keyboardOverlay').classList.add('show');
-        setTimeout(() => document.getElementById('muroInput').focus(), 100);
-    }
-
-    function closeKeyboard() {
-        document.getElementById('keyboardOverlay').classList.remove('show');
-        document.getElementById('muroInput').value = '';
-    }
-
-    function sendToWall() {
-        const texto = document.getElementById('muroInput').value.trim();
-        if (texto && roomID) {
-            socket.emit('enviar-comando', { 
-                cmd: 'muro-broadcast', 
-                texto: texto.toUpperCase(), 
-                room: roomID 
-            });
-            closeKeyboard();
-            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+        // Unión a sala
+        if (!roomID) {
+            console.error("⚠️ No Room ID!");
+            document.getElementById('status').innerText = 'ERROR: NO ROOM';
+        } else {
+            socket.emit('join-room', roomID);
         }
-    }
 
-    document.getElementById('muroInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendToWall();
-    });
+        // Función para enviar comandos
+        function send(cmd) {
+            if (!roomID) return;
+            console.log("📤 Enviando:", cmd);
+            socket.emit('enviar-comando', { cmd, room: roomID, time: Date.now() });
+            if (navigator.vibrate) navigator.vibrate(35);
+        }
 
-    socket.on('connect', () => {
-        document.getElementById('status').className = 'status online';
-        document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
-	// NUEVO: Pedir a la PC que nos mande la canción actual de inmediato
-        send('sync'); 
-    });
-    
-    socket.on('disconnect', () => {
-        document.getElementById('status').className = 'status';
-        document.getElementById('status').innerText = 'OFFLINE';
-    });
+        function openKeyboard() {
+            document.getElementById('keyboardOverlay').classList.add('show');
+            setTimeout(() => document.getElementById('muroInput').focus(), 100);
+        }
 
-    // CORRECCIÓN switchTab (quitamos el error de 'event')
-    function switchTab(tab) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        
-        // Buscamos el elemento que disparó el click de forma segura
-        const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase() === tab.toLowerCase());
-        if (activeTab) activeTab.classList.add('active');
-        
-        document.getElementById('tab-' + tab).classList.add('active');
-    }
+        function closeKeyboard() {
+            document.getElementById('keyboardOverlay').classList.remove('show');
+            document.getElementById('muroInput').value = '';
+        }
 
-    // RECEPTOR DE ACTUALIZACIÓN DE CANCIÓN (MEJORADO)
-    socket.on('ejecutar-comando', (data) => {
-        console.log("📩 Señal recibida:", data.cmd);
-        if (data.cmd === 'update-track') {
-            const trackDisplay = document.getElementById('current-track-name');
-            if (trackDisplay && data.title && data.artist) {
-                trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
-                console.log("✅ Título actualizado:", data.title);
+        function sendToWall() {
+            const texto = document.getElementById('muroInput').value.trim();
+            if (texto && roomID) {
+                socket.emit('enviar-comando', { 
+                    cmd: 'muro-broadcast', 
+                    texto: texto.toUpperCase(), 
+                    room: roomID 
+                });
+                closeKeyboard();
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
             }
         }
-    });
-</script>
+
+        document.getElementById('muroInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendToWall();
+        });
+
+        // Eventos de conexión
+        socket.on('connect', () => {
+            console.log("✅ Socket Conectado");
+            document.getElementById('status').className = 'status online';
+            document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
+            
+            // Sincronizar nombre de canción al entrar
+            setTimeout(() => {
+                if(roomID) send('sync');
+            }, 600);
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('status').className = 'status';
+            document.getElementById('status').innerText = 'OFFLINE';
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase() === tab.toLowerCase());
+            if (activeTab) activeTab.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        // RECEPTOR DE LA CANCIÓN
+        socket.on('ejecutar-comando', (data) => {
+            if (data.cmd === 'update-track') {
+                const trackDisplay = document.getElementById('current-track-name');
+                if (trackDisplay && data.title && data.artist) {
+                    trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
