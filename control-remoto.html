@@ -297,9 +297,10 @@
             border-bottom-color: #00ccff;
         }
 
-        .info-content {
+	.info-content {
             padding: 20px;
-            min-height: 180px;
+            height: 250px; /* Altura fija para que el scroll funcione */
+            overflow-y: auto; /* Permite deslizar hacia abajo para ver todos los logros */
         }
 
         .tab-pane {
