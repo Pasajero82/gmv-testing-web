@@ -3550,46 +3550,53 @@ const qrURL = `https://soloparapruebas.netlify.app/control-remoto.html?room=${my
 
     socket.emit('join-room', myRoom);
 
-    socket.on('ejecutar-comando', (data) => {
-        console.log('📡 Orden:', data.cmd);
-        switch(data.cmd) {
-            case 'next': nextChannel(); break;
-            case 'prev': previousChannel(); break;
-            case 'pause': togglePause(); break;
-            case 'vol-up': changeVolume(10); break;
-            case 'vol-down': changeVolume(-10); break;
-            case 'favorite': toggleFavorite(); break;
-            case 'stats': toggleStatsPanel(); break;
-            case 'achievements': toggleAchievementsPanel(); break;
-            case 'clean': document.body.classList.toggle('clean-mode'); break;
-            case 'share': openShareMenu(); break;
-            case 'fav-menu': toggleFavMenu(); break;
-            case 'marquee': toggleMarqueeContent(); break;
-            case 'rewards': toggleRewardsSidebar(); break;
-	    case 'muro': 
-    const ovMuro = document.getElementById('signal-input-overlay');
-    const fiMuro = document.getElementById('signal-input-field');
-    if (ovMuro && fiMuro) {
-        ovMuro.classList.remove('hidden');
-        ovMuro.classList.add('visible');
-        fiMuro.value = ""; 
-        isInputActive = true;
-        setTimeout(() => fiMuro.focus(), 50);
-    }
-    break;
-
-		case 'muro-broadcast':
-    // Esta función ya la tienes en tu channel.html, solo la llamamos con el texto del celular
-    sendSignalToWall(data.texto); 
-    break;
-		case 'esc': 
-                closeShareMenu(); 
-                closeSignalOverlay(); 
-                // Esta línea mata el QR desde el celular:
-                if (document.getElementById('qr-overlay')) document.getElementById('qr-overlay').style.display = 'none';
-                break;
+socket.on('ejecutar-comando', (data) => {
+    console.log('📡 Orden:', data.cmd);
+    switch(data.cmd) {
+        case 'next': nextChannel(); break;
+        case 'prev': previousChannel(); break;
+        case 'pause': togglePause(); break;
+        case 'vol-up': changeVolume(10); break;
+        case 'vol-down': changeVolume(-10); break;
+        case 'favorite': toggleFavorite(); break;
+        case 'stats': toggleStatsPanel(); break;
+        case 'achievements': toggleAchievementsPanel(); break;
+        case 'clean': document.body.classList.toggle('clean-mode'); break;
+        case 'share': openShareMenu(); break;
+        case 'fav-menu': toggleFavMenu(); break;
+        case 'marquee': toggleMarqueeContent(); break;
+        case 'rewards': toggleRewardsSidebar(); break;
+        
+        case 'muro': {
+            const ovMuro = document.getElementById('signal-input-overlay');
+            const fiMuro = document.getElementById('signal-input-field');
+            if (ovMuro && fiMuro) {
+                ovMuro.classList.remove('hidden');
+                ovMuro.classList.add('visible');
+                fiMuro.value = ""; 
+                isInputActive = true;
+                setTimeout(() => fiMuro.focus(), 50);
+            }
+            break;
         }
-    });
+
+        case 'muro-broadcast':
+            // Recibe el texto directamente del celular y activa la inyección al Excel y al muro
+            if (data.texto) {
+                sendSignalToWall(data.texto); 
+            }
+            break;
+
+        case 'esc': 
+            closeShareMenu(); 
+            closeSignalOverlay(); 
+            // Esta línea mata el QR desde el celular:
+            if (document.getElementById('qr-overlay')) {
+                document.getElementById('qr-overlay').style.display = 'none';
+            }
+            break;
+    }
+});
 </script>
 <div id="sys-notification" class="sys-msg hidden">🔓 SYSTEM OVERRIDE: ACCESS GRANTED</div>
 
