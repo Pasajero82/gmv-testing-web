@@ -3139,42 +3139,56 @@ document.addEventListener('DOMContentLoaded', function() {
             else alert("Error: No videos");
         }
 
-        function playSpecificVideo(video, addToHistory) {      
-			currentVideo = video;
-			// ENVIAR SEÑAL AL CELULAR CON EL NOMBRE DE LA CANCIÓN
-		// Calcular tiempo formateado para el celular
-                const hours = Math.floor(statsData.totalMinutes / 60);
-                const mins = statsData.totalMinutes % 60;
-                const timeStr = `${hours}h ${mins}m`;
+	function playSpecificVideo(video, addToHistory) {      
+            currentVideo = video;
+            
+            // 1. Definir variables necesarias para el envío (EL ARREGLO)
+            const username = localStorage.getItem('gmv_username') || 'GUEST';
+            const levelInfo = calculateLevel(statsData.permanentAchievements);
+            const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
 
-                socket.emit('enviar-comando', {
-                    cmd: 'update-user-data',
-                    username: username.toUpperCase(),
-                    level: onlyLevelName.toUpperCase(),
-                    totalVideos: statsData.totalVideos,
-                    watchTime: timeStr,
-                    room: myRoom
-                });
+            // ENVIAR SEÑAL AL CELULAR CON EL NOMBRE DE LA CANCIÓN
+            socket.emit('enviar-comando', { 
+                cmd: 'update-track', 
+                title: video.title, 
+                artist: video.artist, 
+                room: myRoom 
+            });
 
- 		        if (viewTimer) clearTimeout(viewTimer);
+            // Calcular tiempo formateado para el celular
+            const hours = Math.floor(statsData.totalMinutes / 60);
+            const mins = statsData.totalMinutes % 60;
+            const timeStr = `${hours}h ${mins}m`;
+
+            // Enviar actualización de usuario y estadísticas al celular
+            socket.emit('enviar-comando', {
+                cmd: 'update-user-data',
+                username: username.toUpperCase(),
+                level: onlyLevelName.toUpperCase(),
+                totalVideos: statsData.totalVideos,
+                watchTime: timeStr,
+                room: myRoom
+            });
+
+            if (viewTimer) clearTimeout(viewTimer);
             lastPlayedMusicId = video.id;
             checkNightOwl();
-	    checkEarlyBird(video);
+            checkEarlyBird(video);
+
             if (addToHistory) {
                 historyStack.push(video);
                 if (historyStack.length > 50) historyStack.shift();
-		// Iniciamos el temporizador: Solo cuenta la visita si pasan 60 segundos
-viewTimer = setTimeout(() => {
-    trackVideoView(video);
-    checkAchievements(); // ← AGREGAR ESTA LÍNEA
-   
-    totalViewsForRewards = statsData.totalVideos;
-    updateRewardsUI();
-	
-console.log("View counted for: " + video.title);
-}, MIN_WATCH_TIME);
+
+                viewTimer = setTimeout(() => {
+                    trackVideoView(video);
+                    checkAchievements();
+                    totalViewsForRewards = statsData.totalVideos;
+                    updateRewardsUI();
+                    console.log("View counted for: " + video.title);
+                }, MIN_WATCH_TIME);
             }
             
+            // 2. Ahora sí, cargar el video (Esta línea ya no se bloqueará)
             player.loadVideoById(video.id);
             
             const trackBox = document.getElementById('trackInfoBox');
@@ -3187,13 +3201,11 @@ console.log("View counted for: " + video.title);
             document.getElementById('artistName').innerText = video.artist;
             document.getElementById('trackInfoBox').style.display = 'block';
 
-const badge = document.getElementById('dynamicBadge');
-            // 1. Limpiamos cualquier color viejo
+            const badge = document.getElementById('dynamicBadge');
             badge.className = 'info-badge'; 
 
             if (video.badgeText) {
                 badge.innerText = video.badgeText;
-                // 2. Le ponemos el color nuevo (o azul si no tiene)
                 badge.classList.add('badge-' + (video.badgeColor || 'blue'));
                 badge.style.display = "block";
             } else {
