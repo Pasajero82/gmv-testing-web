@@ -3561,7 +3561,18 @@ socket.on('ejecutar-comando', (data) => {
         case 'favorite': toggleFavorite(); break;
         case 'stats': toggleStatsPanel(); break;
         case 'achievements': toggleAchievementsPanel(); break;
-        case 'clean': document.body.classList.toggle('clean-mode'); break;
+        case 'minimize': {
+    // Buscamos la barra de abajo
+    const bar = document.getElementById('controlsBar');
+    if (bar) bar.classList.toggle('minimized');
+
+    // Buscamos el botón de favoritos de arriba
+    const favBtnTop = document.querySelector('.fav-menu-btn-top');
+    if (favBtnTop) favBtnTop.classList.toggle('minimized');
+    
+    showSystemMessage(bar.classList.contains('minimized') ? "UI: MINIMIZED" : "UI: RESTORED");
+    break;
+}
         case 'share': openShareMenu(); break;
         case 'fav-menu': toggleFavMenu(); break;
         case 'marquee': toggleMarqueeContent(); break;
