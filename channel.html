@@ -3521,9 +3521,8 @@ function loadGlobalVisits() {
    
 window.addEventListener('load', loadGlobalVisits);
 
-    // --- LÓGICA DE LA TECLA "Q" PARA EL QR ---
-    const miIP = "192.168.1.66"; 
-    const qrURL = `http://${miIP}:3000/control-remoto.html?room=${myRoom}`;
+// --- LÓGICA DE LA TECLA "Q" PARA EL QR ---
+const qrURL = `https://soloparapruebas.netlify.app/control-remoto.html?room=${myRoom}`;
 
     setTimeout(() => {
         const qrDiv = document.getElementById("qrcode");
