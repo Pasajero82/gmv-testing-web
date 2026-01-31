@@ -25,23 +25,44 @@
         }
 
         /* STATUS BADGE */
-        .status {
+	/* TOP STATUS BAR */
+        .top-status-bar {
             position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 0.65rem;
-            padding: 6px 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
             letter-spacing: 1px;
+            z-index: 100;
         }
 
-        .status.online {
-            border-color: #00ccff;
+        .user-info {
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+        }
+
+        #remote-username {
+            color: #fff;
+        }
+
+        .level-tag {
+            color: #ff0055; /* Rosa para el nombre del nivel */
+            margin-left: 5px;
+            font-weight: 700;
+        }
+
+        .connection-info {
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Color cuando esté conectado */
+        .top-status-bar.online-mode #status {
             color: #00ccff;
-            box-shadow: 0 0 10px rgba(0,204,255,0.2);
+            text-shadow: 0 0 8px rgba(0,204,255,0.4);
         }
 
         /* REMOTE BODY */
@@ -465,7 +486,13 @@
 </head>
 <body>
 
-    <div id="status" class="status">CONNECTING...</div>
+    <div class="top-status-bar">
+        <div class="user-info">
+            USER: <span id="remote-username">---</span> 
+            <span id="remote-level" class="level-tag">[---]</span>
+        </div>
+        <div id="status" class="connection-info">CONNECTING...</div>
+    </div>
 
 <div class="remote">
 	<div class="now-playing-info">
@@ -683,16 +710,16 @@
         });
 
         // Eventos de conexión
-        socket.on('connect', () => {
-            console.log("✅ Socket Conectado");
-            document.getElementById('status').className = 'status online';
-            document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
-            
-            // Sincronizar nombre de canción al entrar
-            setTimeout(() => {
-                if(roomID) send('sync');
-            }, 600);
-        });
+	socket.on('connect', () => {
+        console.log("✅ Socket Conectado");
+        // Agregamos la clase al contenedor principal para activar los colores
+        document.querySelector('.top-status-bar').classList.add('online-mode');
+        document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
+        
+        setTimeout(() => {
+            if(roomID) send('sync');
+        }, 600);
+    });
 
         socket.on('disconnect', () => {
             document.getElementById('status').className = 'status';
@@ -710,6 +737,15 @@
 
         // RECEPTOR DE LA CANCIÓN
         socket.on('ejecutar-comando', (data) => {
+	// --- RECEPTOR DE USUARIO Y NIVEL ---
+        if (data.cmd === 'update-user-data') {
+            const userEl = document.getElementById('remote-username');
+            const levelEl = document.getElementById('remote-level');
+            if (userEl) userEl.innerText = data.username.toUpperCase();
+            if (levelEl) levelEl.innerText = "[" + data.level.toUpperCase() + "]";
+            return; // Detenemos aquí para que no procese lo que sigue
+        }
+        // ------------------------------------
             if (data.cmd === 'update-track') {
                 const trackDisplay = document.getElementById('current-track-name');
                 if (trackDisplay && data.title && data.artist) {
