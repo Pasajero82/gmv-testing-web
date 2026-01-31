@@ -3603,13 +3603,15 @@ socket.on('ejecutar-comando', (data) => {
                 });
 
                 // 2. Extraer datos reales y mandarlos al celular
-                const username = localStorage.getItem('gmv_username') || 'GUEST';
+		const username = localStorage.getItem('gmv_username') || 'GUEST';
                 const levelInfo = calculateLevel(statsData.permanentAchievements);
-                
+                // Extraemos solo el nombre del nivel (ej. "Newbie")
+                const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
+
                 socket.emit('enviar-comando', {
                     cmd: 'update-user-data',
-                    username: username,
-                    level: levelInfo.title, // Mandamos el nombre del nivel (ej: "Listener")
+                    username: username.toUpperCase(),
+                    level: onlyLevelName.toUpperCase(),
                     room: myRoom
                 });
             }
