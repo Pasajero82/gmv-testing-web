@@ -3569,8 +3569,6 @@ socket.on('ejecutar-comando', (data) => {
     // Buscamos el botón de favoritos de arriba
     const favBtnTop = document.querySelector('.fav-menu-btn-top');
     if (favBtnTop) favBtnTop.classList.toggle('minimized');
-    
-    showSystemMessage(bar.classList.contains('minimized') ? "UI: MINIMIZED" : "UI: RESTORED");
     break;
 }
         case 'share': openShareMenu(); break;
