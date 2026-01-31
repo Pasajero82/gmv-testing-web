@@ -683,6 +683,9 @@
     socket.on('connect', () => {
         document.getElementById('status').className = 'status online';
         document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
+	// NUEVO: Pedir a la PC que nos mande la canción actual de inmediato
+        send('sync'); 
+    });
     });
 
     socket.on('disconnect', () => {

@@ -3573,7 +3573,21 @@ const qrURL = `https://soloparapruebas.netlify.app/control-remoto.html?room=${my
     // Asegurar unión a sala y sincronización
 socket.on('connect', () => {
     console.log("📡 PC conectada. Uniéndose a:", myRoom);
+    // RECONEXIÓN AUTOMÁTICA Y UNIÓN A SALA
+socket.on('connect', () => {
+    console.log("📡 Conexión establecida con Render. Uniéndose a sala:", myRoom);
     socket.emit('join-room', myRoom);
+    
+    // Al conectar, avisamos qué suena por si hay un celular esperando
+    if (currentVideo) {
+        socket.emit('enviar-comando', { 
+            cmd: 'update-track', 
+            title: currentVideo.title, 
+            artist: currentVideo.artist, 
+            room: myRoom 
+        });
+    }
+});
     
     // Si ya hay un video sonando, lo mandamos de inmediato
     if (currentVideo) {
@@ -3589,6 +3603,16 @@ socket.on('connect', () => {
 socket.on('ejecutar-comando', (data) => {
     console.log('📡 Orden:', data.cmd);
     switch(data.cmd) {
+	case 'sync':
+            if (currentVideo) {
+                socket.emit('enviar-comando', { 
+                    cmd: 'update-track', 
+                    title: currentVideo.title, 
+                    artist: currentVideo.artist, 
+                    room: myRoom 
+                });
+            }
+        break;
         case 'next': nextChannel(); break;
         case 'prev': previousChannel(); break;
         case 'pause': togglePause(); break;
