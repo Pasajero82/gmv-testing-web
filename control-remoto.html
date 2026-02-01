@@ -297,49 +297,9 @@
             border-bottom-color: #00ccff;
         }
 
-	/* CONTENEDOR PRINCIPAL FIJO */
         .info-content {
-            padding: 15px 20px;
-            height: 280px; 
-            overflow: hidden; /* Adiós al scroll problemático */
-            position: relative;
-        }
-
-        /* ESTILOS PARA LAS PÁGINAS DE LOGROS */
-        .ach-page {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .ach-page.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        /* ESTILOS PARA LOS PUNTOS DE PAGINACIÓN */
-        .remote-pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 15px;
-            padding-bottom: 10px;
-        }
-
-        .remote-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #333;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .remote-dot.active {
-            background: #00ccff;
-            box-shadow: 0 0 10px rgba(0, 204, 255, 0.6);
-            transform: scale(1.2);
+            padding: 20px;
+            min-height: 180px;
         }
 
         .tab-pane {
@@ -649,9 +609,22 @@
             </div>
 
             <div class="tab-pane" id="tab-awards">
-                <div id="remote-ach-pages-container"></div>
-                
-                <div id="remote-pagination" class="remote-pagination"></div>
+                <div class="stat-item">
+                    <span class="stat-label">🏆 First Step</span>
+                    <span class="stat-value">✓</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🎤 Music Lover</span>
+                    <span class="stat-value">✓</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🔥 Week Warrior</span>
+                    <span class="stat-value">✓</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">👑 GMV Legend</span>
+                    <span class="stat-value">🔒</span>
+                </div>
             </div>
 
             <div class="tab-pane" id="tab-vault">
