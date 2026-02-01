@@ -584,7 +584,7 @@
     <div class="info-panel">
         <div class="info-header">
             <div class="tab active" onclick="switchTab('stats')">STATS</div>
-            <div class="tab" onclick="switchTab('awards')">AWARDS</div>
+            <div class="tab" onclick="switchTab('achievements')">ACHIEVEMENTS</div>
             <div class="tab" onclick="switchTab('vault')">VAULT</div>
         </div>
 
@@ -608,24 +608,16 @@
                 </div>
             </div>
 
-            <div class="tab-pane" id="tab-awards">
-                <div class="stat-item">
-                    <span class="stat-label">🏆 First Step</span>
-                    <span class="stat-value">✓</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">🎤 Music Lover</span>
-                    <span class="stat-value">✓</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">🔥 Week Warrior</span>
-                    <span class="stat-value">✓</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">👑 GMV Legend</span>
-                    <span class="stat-value">🔒</span>
-                </div>
-            </div>
+	<div class="tab-pane" id="tab-achievements">
+    <div id="ach-pages-container-remote" style="min-height: 200px;">
+        <div class="stat-item">
+            <span class="stat-label">WAITING FOR SIGNAL...</span>
+        </div>
+    </div>
+    
+    <div id="ach-pagination-remote" style="display: flex; justify-content: center; gap: 8px; margin-top: 15px;">
+    </div>
+</div>
 
             <div class="tab-pane" id="tab-vault">
                 <div class="stat-item">
@@ -734,34 +726,18 @@
         // RECEPTOR DE LA CANCIÓN
         socket.on('ejecutar-comando', (data) => {
 	// --- RECEPTOR DE USUARIO, STATS Y LOGROS (CORREGIDO) ---
-        if (data.cmd === 'update-user-data') {
-            const userEl = document.getElementById('remote-username');
-            const levelTopEl = document.getElementById('remote-level');
-            const videosEl = document.getElementById('remote-videos');
-            const timeEl = document.getElementById('remote-time');
-            const streakEl = document.getElementById('remote-streak');
-            const levelStatsEl = document.getElementById('remote-level-stats');
-            const achListEl = document.getElementById('remote-achievements-list');
+if (data.cmd === 'update-user-data') {
+            // Actualizamos los textos básicos
+            document.getElementById('remote-username').innerText = data.username;
+            document.getElementById('remote-level').innerText = "[" + data.level + "]";
+            document.getElementById('remote-videos').innerText = data.totalVideos;
+            document.getElementById('remote-time').innerText = data.watchTime;
+            document.getElementById('remote-streak').innerText = data.streak + " days";
+            document.getElementById('remote-level-stats').innerText = data.level;
 
-            if (userEl) userEl.innerText = data.username;
-            if (levelTopEl) levelTopEl.innerText = "[" + data.level + "]";
-            if (videosEl) videosEl.innerText = data.totalVideos;
-            if (timeEl) timeEl.innerText = data.watchTime;
-            if (streakEl) streakEl.innerText = data.streak + " days";
-            if (levelStatsEl) levelStatsEl.innerText = data.level;
-
-            // DIBUJAR LOGROS DINÁMICAMENTE
-            if (achListEl && data.achievements) {
-                achListEl.innerHTML = ''; // Limpiar "Waiting for data..."
-                data.achievements.forEach(ach => {
-                    const item = document.createElement('div');
-                    item.className = 'stat-item';
-                    item.innerHTML = `
-                        <span class="stat-label">${ach.icon} ${ach.name}</span>
-                        <span class="stat-value">${ach.unlocked ? '✓' : '🔒'}</span>
-                    `;
-                    achListEl.appendChild(item);
-                });
+            // Si vienen logros, los dibujamos con el sistema de páginas
+            if (data.achievements) {
+                renderAchievementsRemote(data.achievements);
             }
             return;
         }
@@ -774,6 +750,46 @@
                 }
             }
         });
+	let currentAchPageRemote = 0;
+
+        function renderAchievementsRemote(achList) {
+            const container = document.getElementById('ach-pages-container-remote');
+            const pagination = document.getElementById('ach-pagination-remote');
+            const ACH_PER_PAGE = 4;
+            const totalPages = Math.ceil(achList.length / ACH_PER_PAGE);
+
+            container.innerHTML = '';
+            pagination.innerHTML = '';
+
+            for (let i = 0; i < totalPages; i++) {
+                const page = document.createElement('div');
+                page.className = 'ach-page-remote' + (i === currentAchPageRemote ? ' active' : '');
+                
+                const start = i * ACH_PER_PAGE;
+                const pageAchs = achList.slice(start, start + ACH_PER_PAGE);
+
+                pageAchs.forEach(ach => {
+                    const item = document.createElement('div');
+                    item.className = 'stat-item';
+                    item.innerHTML = `
+                        <span class="stat-label">${ach.icon} ${ach.name}</span>
+                        <span class="stat-value">${ach.unlocked ? '✓' : '🔒'}</span>
+                    `;
+                    page.appendChild(item);
+                });
+                container.appendChild(page);
+
+                // Crear el punto de navegación
+                const dot = document.createElement('div');
+                dot.className = 'remote-dot' + (i === currentAchPageRemote ? ' active' : '');
+                dot.onclick = () => {
+                    currentAchPageRemote = i;
+                    renderAchievementsRemote(achList);
+                };
+                pagination.appendChild(dot);
+            }
+        }
+
     </script>
 </body>
 </html>

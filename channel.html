@@ -3146,6 +3146,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const username = localStorage.getItem('gmv_username') || 'GUEST';
             const levelInfo = calculateLevel(statsData.permanentAchievements);
             const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
+		
+		// Revisamos qué logros tiene el usuario guardados
+            const userAchievements = JSON.parse(localStorage.getItem('gmv_achievements') || '{}');
+            const achievementsStatus = achievementsList.map(ach => ({
+                id: ach.id,
+                name: ach.name,
+                icon: ach.icon,
+                unlocked: !!userAchievements[ach.id]
+            }));
 
             // ENVIAR SEÑAL AL CELULAR CON EL NOMBRE DE LA CANCIÓN
             socket.emit('enviar-comando', { 
@@ -3168,6 +3177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 totalVideos: statsData.totalVideos,
                 watchTime: timeStr,
 		streak: statsData.currentStreak,
+		achievements: achievementsStatus,
                 room: myRoom
             });
 
