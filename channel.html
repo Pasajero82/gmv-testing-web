@@ -2035,7 +2035,12 @@ document.addEventListener('keydown', function(e) {
 	if (e.key === '9') {
             toggleRewardsSidebar();
         }
-    });
+    
+	if (event.key === '+') {
+        triggerVoteAnimation('up');
+        injectVoteToSheet('up');
+    }
+});
  
 // 🎯 FUNCIÓN PARA CERRAR EL OVERLAY (reutilizable)
 function closeSignalOverlay() {
