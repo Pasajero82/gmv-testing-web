@@ -2040,6 +2040,12 @@ document.addEventListener('keydown', function(e) {
         triggerVoteAnimation('up');
         injectVoteToSheet('up');
     }
+
+	// Tecla "-" para voto negativo
+        if (e.key === '-') {
+            triggerVoteAnimation('down');
+            injectVoteToSheet('down');
+        }
 });
  
 // 🎯 FUNCIÓN PARA CERRAR EL OVERLAY (reutilizable)
