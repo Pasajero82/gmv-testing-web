@@ -3701,8 +3701,11 @@ socket.on('ejecutar-comando', (data) => {
             });
             break;
 
-        case 'vote':
-            if (data.voteType) triggerVoteAnimation(data.voteType);
+		case 'vote':
+            	if (data.voteType) {
+                triggerVoteAnimation(data.voteType); // Sigue haciendo la animación
+                injectVoteToSheet(data.voteType);    // <--- AHORA TAMBIÉN INYECTA EL VOTO
+            }
             break;
             
         case 'next': nextChannel(); break;
@@ -3771,6 +3774,17 @@ function triggerVoteAnimation(type) {
     if (overlay) {
         overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'flex' : 'none';
     }
+}
+
+// Función para mandar el voto a Google Sheets
+function injectVoteToSheet(type) {
+    if (!currentVideo || !currentVideo.id) return;
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzD2iB1rAJ-LSbLvfA2hrIXbymgn2PYWFVTdNi7aok-zuODRy0sffvfiYUAdQSBHzcEKQ/exec';
+    const finalURL = `${scriptURL}?id=${currentVideo.id}&type=${type}`;
+
+    fetch(finalURL, { mode: 'no-cors' })
+        .catch(err => console.error("Error inyectando voto:", err));
 }
 </script>
 
