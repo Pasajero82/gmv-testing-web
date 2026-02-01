@@ -522,6 +522,56 @@
             border-radius: 7px;
             box-shadow: 0 0 10px rgba(0, 204, 255, 0.6);
         }
+
+	/* ESTILOS GUERRA DE VOTOS */
+        .vote-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+
+        .vote-btn {
+            background: #1a1a1a;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .vote-btn svg {
+            width: 28px;
+            fill: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Voto Up: Cyan */
+        .vote-btn.up:active {
+            background: #00ccff;
+            border-color: #00ccff;
+            box-shadow: 0 0 25px rgba(0,204,255,0.6);
+        }
+
+        /* Voto Down: Rosa */
+        .vote-btn.down:active {
+            background: #ff0055;
+            border-color: #ff0055;
+            box-shadow: 0 0 25px rgba(255,0,85,0.6);
+        }
+
+        .vote-btn:active svg { fill: #000; }
+
+        /* Estado Bloqueado (Crédito agotado para este video) */
+        .vote-btn.disabled {
+            opacity: 0.15;
+            pointer-events: none;
+            filter: grayscale(1);
+            border-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -538,7 +588,14 @@
 	<div class="now-playing-info">
     <div id="current-track-name">NO SIGNAL DETECTED</div>
 </div>
-
+	<div class="vote-container">
+            <button class="vote-btn up" id="btn-vote-up" onclick="processVote('up')">
+                <svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+            </button>
+            <button class="vote-btn down" id="btn-vote-down" onclick="processVote('down')">
+                <svg viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.37-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+            </button>
+        </div>
     <div class="dpad-container">
         <div class="dpad-bg"></div>
         
@@ -697,6 +754,7 @@
         const socket = io('https://gmv-server.onrender.com');
         const urlParams = new URLSearchParams(window.location.search);
         let roomID = urlParams.get('room');
+	let hasVotedCurrent = false; // Bloqueo de votos por video
 
         // Unión a sala
         if (!roomID) {
@@ -809,6 +867,13 @@ if (data.cmd === 'update-user-data') {
 
         // ------------------------------------
             if (data.cmd === 'update-track') {
+	// DESBLOQUEAR VOTOS PARA LA NUEVA CANCIÓN
+                hasVotedCurrent = false;
+                const bUp = document.getElementById('btn-vote-up');
+                const bDown = document.getElementById('btn-vote-down');
+                if(bUp) bUp.classList.remove('disabled');
+                if(bDown) bDown.classList.remove('disabled');
+
                 const trackDisplay = document.getElementById('current-track-name');
                 if (trackDisplay && data.title && data.artist) {
                     trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
@@ -855,6 +920,26 @@ if (data.cmd === 'update-user-data') {
             }
         }
 
+	function processVote(type) {
+            if (hasVotedCurrent) return;
+
+            // 1. Bloqueo local instantáneo
+            hasVotedCurrent = true;
+            document.getElementById('btn-vote-up').classList.add('disabled');
+            document.getElementById('btn-vote-down').classList.add('disabled');
+
+            // 2. Vibración (Doble pulso para UP, pulso largo para DOWN)
+            if (navigator.vibrate) {
+                type === 'up' ? navigator.vibrate([40, 30, 40]) : navigator.vibrate(100);
+            }
+
+            // 3. Enviar señal a la PC
+            socket.emit('enviar-comando', { 
+                cmd: 'vote', 
+                voteType: type, 
+                room: roomID 
+            });
+        }
     </script>
 </body>
 </html>
