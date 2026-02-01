@@ -884,19 +884,20 @@ if (data.cmd === 'update-user-data') {
         }
 
         // ------------------------------------
-            if (data.cmd === 'update-track') {
-	// DESBLOQUEAR VOTOS PARA LA NUEVA CANCIÓN
-                hasVotedCurrent = false;
-                const bUp = document.getElementById('btn-vote-up');
-                const bDown = document.getElementById('btn-vote-down');
-                if(bUp) bUp.classList.remove('disabled');
-                if(bDown) bDown.classList.remove('disabled');
+	if (data.cmd === 'update-track') {
+    hasVotedCurrent = false;
+    const bUp = document.getElementById('btn-vote-up');
+    const bDown = document.getElementById('btn-vote-down');
+    
+    // Limpiamos bloqueo y colores previos
+    if(bUp) bUp.classList.remove('disabled', 'voted');
+    if(bDown) bDown.classList.remove('disabled', 'voted');
 
-                const trackDisplay = document.getElementById('current-track-name');
-                if (trackDisplay && data.title && data.artist) {
-                    trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
-                }
-            }
+    const trackDisplay = document.getElementById('current-track-name');
+    if (trackDisplay && data.title && data.artist) {
+        trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
+    }
+}
         });
 	let currentAchPageRemote = 0;
 
