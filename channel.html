@@ -3906,7 +3906,7 @@ function triggerVoteAnimation(type) {
             const icons = (type === 'up') ? posIcons : negIcons;
             const shadowColor = (type === 'up') ? 'rgba(255, 0, 85, 0.5)' : 'rgba(0, 255, 100, 0.5)';
 
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 60; i++) {
                 setTimeout(() => {
                     const el = document.createElement('div');
                     el.className = 'vote-particle';
@@ -3921,7 +3921,7 @@ function triggerVoteAnimation(type) {
                     el.style.animationDuration = duration + 's';
 
                     layer.appendChild(el);
-                    setTimeout(() => el.remove(), 5000);
+                    setTimeout(() => el.remove(), 10000);
                 }, i * 110);
             }
         }
