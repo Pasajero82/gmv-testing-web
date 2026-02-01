@@ -3625,7 +3625,7 @@ socket.on('ejecutar-comando', (data) => {
     switch(data.cmd) {
 	case 'sync':
             if (currentVideo) {
-                // 1. Mandar la canción actual para la marquesina
+                // 1. Mandar la canción actual
                 socket.emit('enviar-comando', { 
                     cmd: 'update-track', 
                     title: currentVideo.title, 
@@ -3633,23 +3633,32 @@ socket.on('ejecutar-comando', (data) => {
                     room: myRoom 
                 });
 
-                // 2. Extraer datos, calcular tiempo y mandar todo al celular
+                // 2. Preparar datos de usuario y LOGROS
                 const username = localStorage.getItem('gmv_username') || 'GUEST';
                 const levelInfo = calculateLevel(statsData.permanentAchievements);
                 const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
-                
-                // Cálculo de tiempo para el envío
                 const hSync = Math.floor(statsData.totalMinutes / 60);
                 const mSync = statsData.totalMinutes % 60;
                 const timeStrSync = `${hSync}h ${mSync}m`;
 
+                // 3. Procesar lista de logros para el envío
+                const userAchievements = JSON.parse(localStorage.getItem('gmv_achievements') || '{}');
+                const achievementsStatus = achievementsList.map(ach => ({
+                    id: ach.id,
+                    name: ach.name,
+                    icon: ach.icon,
+                    unlocked: !!userAchievements[ach.id]
+                }));
+
+                // 4. Enviar paquete completo al celular de inmediato
                 socket.emit('enviar-comando', {
                     cmd: 'update-user-data',
                     username: username.toUpperCase(),
                     level: onlyLevelName.toUpperCase(),
                     totalVideos: statsData.totalVideos,
                     watchTime: timeStrSync,
-		    streak: statsData.currentStreak,
+                    streak: statsData.currentStreak,
+                    achievements: achievementsStatus, 
                     room: myRoom
                 });
             }

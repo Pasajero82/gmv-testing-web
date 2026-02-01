@@ -478,6 +478,38 @@
     color: white;
     box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
 }
+	/* --- ACHIEVEMENT PAGES & DOTS --- */
+        .ach-page-remote {
+            display: none !important; /* Esconde todas las páginas por defecto */
+            width: 100%;
+        }
+
+        .ach-page-remote.active {
+            display: block !important; /* Solo muestra la página que tiene la clase 'active' */
+            animation: fadeInPage 0.3s ease forwards;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .remote-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remote-dot.active {
+            background: #00ccff;
+            width: 12px;
+            height: 8px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.6);
+        }
     </style>
 </head>
 <body>
