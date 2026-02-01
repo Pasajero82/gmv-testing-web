@@ -1781,7 +1781,7 @@
 <body>
 
     <div id="animation-layer"></div>
-    <div id="start-screen">
+    <div id="start-screen" style="display: none;">
         <div class="logo-container">
             <div class="ring ring-1"></div>
             <div class="ring ring-2"></div>
@@ -1852,7 +1852,7 @@
             </div>
         </div>
 
-        <div class="bottom-controls-bar" id="controlsBar" style="display:none;">
+        <div class="bottom-controls-bar" id="controlsBar" style="display:flex;">
             <div class="left-group">
                 <div class="interaction-container">
                     <div class="action-icon-btn" id="favBtn" onclick="toggleFavorite()" title="Save to Favorites">★</div>
@@ -1930,7 +1930,7 @@
             <div class="toast-desc" id="toast-desc">Description</div>
         </div>
 
-        <div class="overlay" id="tvOverlay">
+        <div class="overlay" id="tvOverlay" style="display: block;">
             <div class="logo-watermark">
                 <img src="logo.png" alt="GMV Logo" class="corner-logo">
             </div>
