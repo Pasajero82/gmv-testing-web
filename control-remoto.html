@@ -566,12 +566,30 @@
         .vote-btn:active svg { fill: #000; }
 
         /* Estado Bloqueado (Crédito agotado para este video) */
-        .vote-btn.disabled {
-            opacity: 0.15;
-            pointer-events: none;
-            filter: grayscale(1);
-            border-color: transparent;
-        }
+	.vote-btn.disabled {
+    	pointer-events: none; /* Nadie puede volver a hacer clic */
+    	filter: none !important; /* PROHIBIDO EL GRIS */
+    	opacity: 0.8; /* Se ve casi normal, pero bloqueado */
+}
+/* 2. Pulgar arriba: Cyan suave */
+.vote-btn.up.voted {
+    background: rgba(0, 204, 255, 0.15) !important; /* Fondo suave */
+    border-color: rgba(0, 204, 255, 0.5) !important;
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.2);
+}
+.vote-btn.up.voted svg { 
+    fill: #00ccff !important; /* El icono se pone cyan */
+}
+
+/* 3. Pulgar abajo: Rosa suave */
+.vote-btn.down.voted {
+    background: rgba(255, 0, 85, 0.15) !important; /* Fondo suave */
+    border-color: rgba(255, 0, 85, 0.5) !important;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
+}
+.vote-btn.down.voted svg { 
+    fill: #ff0055 !important; /* El icono se pone rosa */
+}
     </style>
 </head>
 <body>
@@ -921,25 +939,35 @@ if (data.cmd === 'update-user-data') {
         }
 
 	function processVote(type) {
-            if (hasVotedCurrent) return;
+    if (hasVotedCurrent) return;
 
-            // 1. Bloqueo local instantáneo
-            hasVotedCurrent = true;
-            document.getElementById('btn-vote-up').classList.add('disabled');
-            document.getElementById('btn-vote-down').classList.add('disabled');
+    // 1. Bloqueo de seguridad
+    hasVotedCurrent = true;
+    const btnUp = document.getElementById('btn-vote-up');
+    const btnDown = document.getElementById('btn-vote-down');
 
-            // 2. Vibración (Doble pulso para UP, pulso largo para DOWN)
-            if (navigator.vibrate) {
-                type === 'up' ? navigator.vibrate([40, 30, 40]) : navigator.vibrate(100);
-            }
+    // 2. Pintar el botón que tocaste y bloquear ambos
+    if (type === 'up') {
+        btnUp.classList.add('voted');
+    } else {
+        btnDown.classList.add('voted');
+    }
 
-            // 3. Enviar señal a la PC
-            socket.emit('enviar-comando', { 
-                cmd: 'vote', 
-                voteType: type, 
-                room: roomID 
-            });
-        }
+    btnUp.classList.add('disabled');
+    btnDown.classList.add('disabled');
+
+    // 3. Vibración y envío a PC
+    if (navigator.vibrate) {
+        type === 'up' ? navigator.vibrate([40, 30, 40]) : navigator.vibrate(100);
+    }
+
+    socket.emit('enviar-comando', { 
+        cmd: 'vote', 
+        voteType: type, 
+        room: roomID 
+    });
+}	
+
     </script>
 </body>
 </html>
