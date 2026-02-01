@@ -2052,5 +2052,135 @@
         <div id="qrcode" style="padding: 24px; background: white; border-radius: 12px; border: 2px solid var(--primary);"></div>
         <p style="margin-top: 24px; font-family: 'Space Grotesk', sans-serif; color: var(--primary); font-size: 1rem; font-weight: 600; letter-spacing: 2px;">SCAN TO CONNECT</p>
     </div>
+
+<script>
+var player;
+var playerReady = false;
+var videoCount = 0;
+var currentVideo = null;
+var musicQueue = [];
+var lastPlayedMusicId = "";
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function getNextMusic() {
+    if (typeof musicVideos === 'undefined' || musicVideos.length === 0) return null;
+    if (musicQueue.length === 0) {
+        musicQueue = [...musicVideos]; 
+        shuffleArray(musicQueue);
+        if (musicQueue.length > 1 && musicQueue[0].id === lastPlayedMusicId) {
+            musicQueue.push(musicQueue.shift());
+        }
+    }
+    return musicQueue.shift();
+}
+
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+        height: '100%', 
+        width: '100%',
+        playerVars: { 
+            'controls': 0, 
+            'rel': 0, 
+            'playsinline': 1, 
+            'iv_load_policy': 3, 
+            'fs': 0, 
+            'disablekb': 1 
+        },
+        events: { 
+            'onReady': onPlayerReady, 
+            'onStateChange': onPlayerStateChange, 
+            'onError': onPlayerError 
+        }
+    });
+}
+
+function onPlayerReady(event) {
+    playerReady = true;
+    player.setVolume(100);
+    console.log("TV Ready");
+    playNextVideo();
+}
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) playNextVideo();
+    if (event.data === YT.PlayerState.PLAYING) {
+        const btn = document.getElementById('playPauseBtn');
+        if(btn) btn.innerHTML = "⏸";
+    }
+}
+
+function onPlayerError(event) { 
+    playNextVideo(); 
+}
+
+function playNextVideo() {
+    videoCount++;
+    const video = getNextMusic();
+    if (video) {
+        currentVideo = video;
+        lastPlayedMusicId = video.id;
+        player.loadVideoById(video.id);
+        
+        document.getElementById('songTitle').innerText = video.title;
+        document.getElementById('artistName').innerText = video.artist;
+        document.getElementById('trackInfoBox').style.display = 'block';
+        
+        const badge = document.getElementById('dynamicBadge');
+        if (video.badgeText) {
+            badge.innerText = video.badgeText;
+            badge.classList.add('badge-' + (video.badgeColor || 'blue'));
+            badge.style.display = "block";
+        } else {
+            badge.style.display = "none";
+        }
+    }
+}
+
+function nextChannel() { 
+    playNextVideo(); 
+}
+
+function togglePause() {
+    if (!player) return;
+    const state = player.getPlayerState();
+    const btn = document.getElementById('playPauseBtn');
+    if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo(); 
+        btn.innerHTML = "▶"; 
+    } else {
+        player.playVideo(); 
+        btn.innerHTML = "⏸"; 
+    }
+}
+
+function previousChannel() {
+    playNextVideo();
+}
+
+function setVolume(val) { 
+    if (player && player.setVolume) player.setVolume(val); 
+}
+
+// Atajos de teclado básicos
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowRight') nextChannel();
+    if (event.key === 'ArrowLeft') previousChannel();
+    if (event.key === ' ' || event.key === 'Spacebar') {
+        event.preventDefault();
+        togglePause();
+    }
+});
+
+if (window.YT && window.YT.Player) {
+    onYouTubeIframeAPIReady();
+}
+</script>
 </body>
 </html>
