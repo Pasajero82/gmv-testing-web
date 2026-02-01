@@ -3655,56 +3655,54 @@ socket.on('connect', () => {
 });
 
 // 2. Escucha de comandos del control remoto
+// --- RECEPTOR DE SEÑAL Y COMANDOS (CORREGIDO) ---
 socket.on('ejecutar-comando', (data) => {
     console.log('📩 Orden recibida:', data.cmd);
+    
     switch(data.cmd) {
-	case 'sync':
+        case 'sync':
             if (currentVideo) {
-                // 1. Mandar la canción actual
                 socket.emit('enviar-comando', { 
                     cmd: 'update-track', 
                     title: currentVideo.title, 
                     artist: currentVideo.artist, 
                     room: myRoom 
                 });
-	}
+            }
 
-                // 2. Preparar datos de usuario y LOGROS
-                const username = localStorage.getItem('gmv_username') || 'GUEST';
-                const levelInfo = calculateLevel(statsData.permanentAchievements);
-                const onlyLevelName = levelInfo.title.split(' - ')[1] || levelInfo.title;
-                const hSync = Math.floor(statsData.totalMinutes / 60);
-                const mSync = statsData.totalMinutes % 60;
-                const timeStrSync = `${hSync}h ${mSync}m`;
+            const usernameSync = localStorage.getItem('gmv_username') || 'GUEST';
+            const levelInfoSync = calculateLevel(statsData.permanentAchievements);
+            const levelNameSync = levelInfoSync.title.split(' - ')[1] || levelInfoSync.title;
+            const hSync = Math.floor(statsData.totalMinutes / 60);
+            const mSync = statsData.totalMinutes % 60;
+            const timeStrSync = `${hSync}h ${mSync}m`;
 
-                // 3. Procesar lista de logros para el envío
-                const userAchievements = JSON.parse(localStorage.getItem('gmv_achievements') || '{}');
-                const achievementsStatus = achievementsList.map(ach => ({
-                    id: ach.id,
-                    name: ach.name,
-                    icon: ach.icon,
-                    unlocked: !!userAchievements[ach.id]
-                }));
+            const userAchSync = JSON.parse(localStorage.getItem('gmv_achievements') || '{}');
+            const achStatusSync = achievementsList.map(ach => ({
+                id: ach.id,
+                name: ach.name,
+                icon: ach.icon,
+                unlocked: !!userAchSync[ach.id]
+            }));
 
-                // 4. Enviar paquete completo al celular de inmediato
-                socket.emit('enviar-comando', {
-                    cmd: 'update-user-data',
-                    username: username.toUpperCase(),
-                    level: onlyLevelName.toUpperCase(),
-                    totalVideos: statsData.totalVideos,
-                    watchTime: timeStrSync,
-                    streak: statsData.currentStreak,
-                    achievements: achievementsStatus, 
-                    room: myRoom
-                });
+            const currentFavsSync = JSON.parse(localStorage.getItem('gmv_favorites') || '[]');
+            const isFavoriteSync = currentVideo ? currentFavsSync.includes(currentVideo.id) : false;
+
+            socket.emit('enviar-comando', {
+                cmd: 'update-user-data',
+                username: usernameSync.toUpperCase(),
+                level: levelNameSync.toUpperCase(),
+                totalVideos: statsData.totalVideos,
+                watchTime: timeStrSync,
+                streak: statsData.currentStreak,
+                achievements: achStatusSync, 
+                isFavorite: isFavoriteSync,
+                room: myRoom
+            });
             break;
-	});
-            break; // <--- Este es el break del bloque que encontraste
 
         case 'vote':
-            if (data.voteType) {
-                triggerVoteAnimation(data.voteType);
-            }
+            if (data.voteType) triggerVoteAnimation(data.voteType);
             break;
             
         case 'next': nextChannel(); break;
@@ -3726,27 +3724,13 @@ socket.on('ejecutar-comando', (data) => {
         case 'fav-menu': toggleFavMenu(); break;
         case 'marquee': toggleMarqueeContent(); break;
         case 'rewards': toggleRewardsSidebar(); break;
-        case 'muro': {
-            const ovMuro = document.getElementById('signal-input-overlay');
-            const fiMuro = document.getElementById('signal-input-field');
-            if (ovMuro && fiMuro) {
-                ovMuro.classList.remove('hidden');
-                ovMuro.classList.add('visible');
-                fiMuro.value = ""; 
-                isInputActive = true;
-                setTimeout(() => fiMuro.focus(), 50);
-            }
-            break;
-        }
         case 'muro-broadcast':
             if (data.texto) sendSignalToWall(data.texto); 
             break;
         case 'esc': 
             closeShareMenu(); 
             closeSignalOverlay(); 
-            if (document.getElementById('qr-overlay')) {
-                document.getElementById('qr-overlay').style.display = 'none';
-            }
+            document.getElementById('qr-overlay').style.display = 'none';
             break;
     }
 });
@@ -3782,28 +3766,13 @@ function triggerVoteAnimation(type) {
             }
         }
 
+	function toggleQRDesdeIcono() {
+    const overlay = document.getElementById('qr-overlay');
+    if (overlay) {
+        overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'flex' : 'none';
+    }
+}
 </script>
-<div id="sys-notification" class="sys-msg hidden">🔓 SYSTEM OVERRIDE: ACCESS GRANTED</div>
-
-<div id="signal-input-overlay" class="sys-msg hidden" height: auto; pointer-events: auto;">
-    <div style="color: #ff0055; margin-bottom: 10px;">[ INJECT SIGNAL INTO WALL ]</div>
-    <input type="text" id="signal-input-field" 
-           style="background: #000; border: 1px solid #ff0055; color: #ff0055; width: 100%; padding: 10px; font-family: 'JetBrains Mono', monospace; outline: none;" 
-           placeholder="WRITE YOUR MESSAGE..." maxlength="100">
-    <div style="font-size: 0.7rem; color: #555; margin-top: 10px;">PRESS [ENTER] TO SEND OR [ESC] TO CANCEL</div>
-</div>
-
-<div id="share-modal">
-    <div class="share-header">📡 SHARE THIS TRACK</div>
-    <div class="share-buttons">
-        <button class="share-btn twitter" onclick="shareOn('twitter')">🐦 Twitter</button>
-        <button class="share-btn facebook" onclick="shareOn('facebook')">📘 Facebook</button>
-        <button class="share-btn whatsapp" onclick="shareOn('whatsapp')">💬 WhatsApp</button>
-        <button class="share-btn telegram" onclick="shareOn('telegram')">✈️ Telegram</button>
-        <button class="share-btn copy" onclick="shareOn('copy')">📋 Copy Text</button>
-    </div>
-    <button class="share-close" onclick="closeShareMenu()">CLOSE [ESC]</button>
-</div>
 
 <div id="signal-input-overlay" class="sys-msg hidden" style="top: 50%; height: auto; pointer-events: auto;">
     <div style="color: #ff0055; margin-bottom: 10px;">[ INJECT SIGNAL INTO WALL ]</div>
