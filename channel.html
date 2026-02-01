@@ -1632,6 +1632,63 @@
                 opacity: 0;
             }
         }
+	/* --- ESTILO DEL RANKING --- */
+#ranking-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 400px;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid #FFD700;
+    padding: 20px;
+    z-index: 200;
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+#ranking-panel.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ranking-header {
+    color: #FFD700;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #FFD700;
+    padding-bottom: 10px;
+}
+
+.ranking-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 5px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.rank-artist {
+    color: #fff;
+    font-weight: bold;
+}
+
+.rank-votes {
+    color: #00ccff;
+}
+
+.ranking-footer {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #444;
+}
+
     </style>
 </head>
 <body>
@@ -1796,6 +1853,15 @@
                 <h3 id="artistName">Please wait...</h3>
             </div>
         </div>
+
+	<div id="ranking-panel">
+    <div class="ranking-header">🌟 WEEKLY TOP 10</div>
+    <div id="ranking-list-content">
+        <div style="text-align:center; color:#555; font-size:0.8rem; padding:20px;">CONNECTING TO DATABASE...</div>
+    </div>
+    <div class="ranking-footer">PRESS [*] TO CLOSE</div>
+</div>
+
     </div>
 	<div id="rewardsSidebar" class="rewards-sidebar">
         
@@ -2045,6 +2111,11 @@ document.addEventListener('keydown', function(e) {
         if (e.key === '-') {
             triggerVoteAnimation('down');
             injectVoteToSheet('down');
+        }
+
+	// Tecla "*" para abrir/cerrar el TOP 10
+        if (e.key === '*' || e.key === 'Multiply') {
+            toggleRanking();
         }
 });
  
@@ -3489,6 +3560,60 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// --- LÓGICA PARA OBTENER EL RANKING DE GOOGLE SHEETS ---
+const rankingURL = "https://script.google.com/macros/s/AKfycbzD2iB1rAJ-LSbLvfA2hrIXbymgn2PYWFVTdNi7aok-zuODRy0sffvfiYUAdQSBHzcEKQ/exec";
+let rankingVisible = false;
+
+async function toggleRanking() {
+    const panel = document.getElementById('ranking-panel');
+    const content = document.getElementById('ranking-list-content');
+
+    if (rankingVisible) {
+        panel.classList.remove('show');
+        rankingVisible = false;
+    } else {
+        panel.classList.add('show');
+        rankingVisible = true;
+        
+        // Mensaje de carga inicial
+        content.innerHTML = '<div style="text-align:center; color:#FFD700; padding:20px; font-size:0.8rem;">LOADING DATA...</div>';
+
+        try {
+            // Pedimos los datos a Google
+            const response = await fetch(`${rankingURL}?action=getTop10`);
+            const data = await response.json();
+
+            if (data.length === 0) {
+                content.innerHTML = '<div style="text-align:center; color:#555; padding:20px;">NO VOTES RECORDED</div>';
+                return;
+            }
+
+            // Construimos la lista visual
+            let html = "";
+            data.forEach((item, index) => {
+                // Solo mostrar si hay un nombre de artista
+                if(item.artist) {
+                    html += `
+                        <div class="ranking-item">
+                            <div class="rank-number">#${index + 1}</div>
+                            <div class="rank-info">
+                                <div class="rank-artist">${item.artist}</div>
+                                <div style="font-size:0.7rem; color:#888;">${item.title}</div>
+                            </div>
+                            <div class="rank-votes">${item.votes} PTS</div>
+                        </div>
+                    `;
+                }
+            });
+            content.innerHTML = html;
+
+        } catch (error) {
+            console.error("Error al obtener ranking:", error);
+            content.innerHTML = '<div style="text-align:center; color:#ff4444; padding:20px;">CONNECTION ERROR</div>';
+        }
+    }
+}
 </script>
 <script>
     // --- PROTECCIÓN BÁSICA ---
