@@ -3155,6 +3155,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon: ach.icon,
                 unlocked: !!userAchievements[ach.id]
             }));
+		const currentFavs = JSON.parse(localStorage.getItem('gmv_favorites') || '[]');
+            const isFavorite = currentFavs.includes(currentVideo.id);
 
             // ENVIAR SEÑAL AL CELULAR CON EL NOMBRE DE LA CANCIÓN
             socket.emit('enviar-comando', { 
@@ -3178,6 +3180,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 watchTime: timeStr,
 		streak: statsData.currentStreak,
 		achievements: achievementsStatus,
+		isFavorite: isFavorite,
                 room: myRoom
             });
 

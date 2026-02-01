@@ -237,6 +237,18 @@
             color: #fff;
             fill: #fff;
         }
+	/* ESTADO ACTIVO CUANDO ES FAVORITO */
+        .func-btn.fav.is-favorite {
+            background: #ff0055;
+            border-color: #ff0055;
+            box-shadow: 0 0 15px rgba(255,0,85,0.4);
+        }
+
+        .func-btn.fav.is-favorite svg,
+        .func-btn.fav.is-favorite .label {
+            color: #fff;
+            fill: #fff;
+        }
 
         /* ESC BUTTON - DESTACADO CON ROSA */
         .func-btn.esc {
@@ -766,7 +778,15 @@ if (data.cmd === 'update-user-data') {
             document.getElementById('remote-time').innerText = data.watchTime;
             document.getElementById('remote-streak').innerText = data.streak + " days";
             document.getElementById('remote-level-stats').innerText = data.level;
-
+		// CONTROL DEL BOTÓN FAVORITO
+            const favBtn = document.querySelector('.func-btn.fav');
+            if (favBtn) {
+                if (data.isFavorite) {
+                    favBtn.classList.add('is-favorite');
+                } else {
+                    favBtn.classList.remove('is-favorite');
+                }
+            }
             // Si vienen logros, los dibujamos con el sistema de páginas
             if (data.achievements) {
                 renderAchievementsRemote(data.achievements);
