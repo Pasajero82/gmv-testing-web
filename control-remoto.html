@@ -904,8 +904,8 @@ const socket = io('https://gmv-server.onrender.com');
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'es-MX'; // Español de México
-        recognition.continuous = false;
-        recognition.interimResults = true;
+	recognition.continuous = false;
+	recognition.interimResults = false;
         recognition.maxAlternatives = 1;
     }
 
@@ -931,6 +931,7 @@ const socket = io('https://gmv-server.onrender.com');
             alert('Tu navegador no soporta reconocimiento de voz');
             return;
         }
+	console.log("Iniciando reconocimiento de voz...");
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1029,7 +1030,14 @@ const socket = io('https://gmv-server.onrender.com');
         marquee.innerText = "ERROR: " + event.error.toUpperCase();
         console.error("Speech Error:", event.error);
     };
+	recognition.onspeechend = () => {
+    console.log("Dejaste de hablar, procesando...");
+};
 
+recognition.onnomatch = () => {
+    document.getElementById('current-track-name').innerText = "NO MATCH - TRY AGAIN";
+    console.log("No se reconoció el comando");
+};
     recognition.onend = () => {
         document.getElementById('voice-trigger-btn').classList.remove('active');
         cancelAnimationFrame(animationId);
