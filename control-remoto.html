@@ -947,11 +947,6 @@ async function startVoiceControl() {
         alert("Error: " + e.message);
     }
 }
-        } catch (err) { 
-            console.error('Error al acceder al micrófono:', err);
-            alert('No se pudo acceder al micrófono. Verifica los permisos.');
-        }
-    }
 
 recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
