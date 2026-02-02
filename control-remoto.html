@@ -949,84 +949,89 @@ try {
 }
 
 recognition.onresult = (event) => {
-	const lastResult = event.results[event.results.length - 1];
-	const transcript = lastResult[0].transcript;
-        const command = transcript.toLowerCase().trim();
-        
-        const marquee = document.getElementById('current-track-name');
-        marquee.innerText = ">> " + transcript.toUpperCase();
-        
-        if (command.includes("siguiente") || command.includes("next")) {
-            send('next');
-            marquee.innerText = "✓ NEXT";
-        }
-        else if (command.includes("anterior") || command.includes("atrás") || command.includes("previous")) {
-            send('prev');
-            marquee.innerText = "✓ PREV";
-        }
-        else if (command.includes("pausa") || command.includes("pausar") || command.includes("pause")) {
-            send('pause');
-            marquee.innerText = "✓ PAUSE";
-        }
-        else if (command.includes("reproducir") || command.includes("play") || command.includes("reproduce")) {
-            send('pause');
-            marquee.innerText = "✓ PLAY";
-        }
-        else if (command.includes("subir volumen") || command.includes("más volumen")) {
-            send('vol-up');
-            marquee.innerText = "✓ VOL +";
-        }
-        else if (command.includes("bajar volumen") || command.includes("menos volumen")) {
-            send('vol-down');
-            marquee.innerText = "✓ VOL -";
-        }
-        else if (command.includes("escape") || command.includes("salir") || command.includes("cerrar")) {
-            send('esc');
-            marquee.innerText = "✓ ESC";
-        }
-        else if (command.includes("me gusta") || command.includes("like") || command.includes("pulgar arriba")) {
-            processVote('up');
-            marquee.innerText = "✓ LIKE";
-        }
-        else if (command.includes("no me gusta") || command.includes("dislike") || command.includes("pulgar abajo")) {
-            processVote('down');
-            marquee.innerText = "✓ DISLIKE";
-        }
-        else if (command.includes("agregar favorito") || command.includes("añadir favorito") || command.includes("favorito")) {
-            toggleFavLocal();
-            marquee.innerText = "✓ FAV";
-        }
-        else if (command.includes("lista favoritos") || command.includes("ver favoritos") || command.includes("mostrar favoritos")) {
-            send('fav-menu');
-            marquee.innerText = "✓ FAV LIST";
-        }
-        else if (command.includes("estadísticas") || command.includes("stats")) {
-            send('stats');
-            switchTab('stats');
-            marquee.innerText = "✓ STATS";
-        }
-        else if (command.includes("logros") || command.includes("awards") || command.includes("achievements")) {
-            send('achievements');
-            switchTab('achievements');
-            marquee.innerText = "✓ AWARDS";
-        }
-        else if (command.includes("recompensas") || command.includes("bóveda") || command.includes("vault")) {
-            send('rewards');
-            switchTab('vault');
-            marquee.innerText = "✓ VAULT";
-        }
-        else if (command.includes("muro") || command.includes("wall") || command.includes("mensaje")) {
-            openKeyboard();
-            marquee.innerText = "✓ WALL";
-        }
-        else if (command.includes("compartir") || command.includes("share")) {
-            send('share');
-            marquee.innerText = "✓ SHARE";
-        }
-        else if (command.includes("ocultar") || command.includes("minimizar") || command.includes("hide")) {
-            send('minimize');
-            marquee.innerText = "✓ HIDE";
-        }
+    const transcript = event.results[event.results.length - 1][0].transcript;
+    const command = transcript.toLowerCase().trim();
+    const marquee = document.getElementById('current-track-name');
+    
+    marquee.innerText = ">> " + transcript.toUpperCase();
+
+    // 1. VOTOS (NEGATIVOS PRIMERO PARA QUE NO SE CONFUNDA CON "ME GUSTA")
+    if (command.includes("no me gusta") || command.includes("dislike") || command.includes("odio") || command.includes("mierda")) {
+        processVote('down');
+        marquee.innerText = "✓ DISLIKE";
+    }
+    else if (command.includes("me gusta") || command.includes("like") || command.includes("encanta") || command.includes("amo")) {
+        processVote('up');
+        marquee.innerText = "✓ LIKE";
+    }
+
+    // 2. SILENCIO TOTAL
+    else if (command.includes("silencio") || command.includes("mutear") || command.includes("mute") || command.includes("callar")) {
+        send('mute');
+        marquee.innerText = "✓ MUTE";
+    }
+
+    // 3. FAVORITOS (SEPARADOS: LISTA VS AÑADIR)
+    else if (command.includes("lista") || command.includes("ver favoritos") || command.includes("mostrar favoritos")) {
+        send('fav-menu'); // Abre el menú en la PC
+        marquee.innerText = "✓ FAV LIST";
+    }
+    else if (command.includes("favorito") || command.includes("añadir")) {
+        toggleFavLocal(); // Añade la canción actual
+        marquee.innerText = "✓ FAV UPDATED";
+    }
+
+    // 4. INTERFAZ (MOSTRAR Y OCULTAR)
+    else if (command.includes("mostrar") || command.includes("enseñar") || command.includes("ver")) {
+        send('minimize'); // Toggle para mostrar
+        marquee.innerText = "✓ SHOWING";
+    }
+    else if (command.includes("ocultar") || command.includes("minimizar") || command.includes("hide")) {
+        send('minimize'); // Toggle para ocultar
+        marquee.innerText = "✓ HIDING";
+    }
+
+    // 5. MURO (PC) Y TECLADO (MANDO)
+    else if (command.includes("muro") || command.includes("wall")) {
+        send('marquee'); // Muestra el feed en la PC
+        marquee.innerText = "✓ WALL VIEW";
+    }
+    else if (command.includes("escribir") || command.includes("mensaje")) {
+        openKeyboard(); // Abre el teclado en el celular
+        marquee.innerText = "✓ KEYBOARD";
+    }
+
+    // 6. PESTAÑAS Y BÓVEDA
+    else if (command.includes("recompensa") || command.includes("bóveda") || command.includes("vault")) {
+        send('rewards');
+        switchTab('vault');
+        marquee.innerText = "✓ VAULT";
+    }
+    else if (command.includes("estadística") || command.includes("stats")) {
+        send('stats');
+        switchTab('stats');
+    }
+    else if (command.includes("logro") || command.includes("awards")) {
+        send('achievements');
+        switchTab('achievements');
+    }
+
+    // 7. NAVEGACIÓN Y SALIR
+    else if (command.includes("siguiente") || command.includes("next")) {
+        send('next');
+    }
+    else if (command.includes("anterior") || command.includes("atrás")) {
+        send('prev');
+    }
+    else if (command.includes("escape") || command.includes("salir") || command.includes("cerrar")) {
+        send('esc');
+    }
+
+    // 8. BÚSQUEDA (SI NO ES NADA DE LO ANTERIOR)
+    else {
+        marquee.innerText = "🔍 " + transcript.toUpperCase();
+        socket.emit('enviar-comando', { cmd: 'voice-search', query: command, room: roomID });
+    }
 };
 
 recognition.onerror = (event) => {
