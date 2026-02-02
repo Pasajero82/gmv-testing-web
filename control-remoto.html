@@ -903,10 +903,10 @@ const socket = io('https://gmv-server.onrender.com');
     let recognition;
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-	recognition.lang = 'es-MX'; 
+        recognition.lang = 'es-MX'; // Español de México
         recognition.continuous = false;
-	recognition.interimResults = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
     }
 
     let audioContext, analyser, dataArray, animationId;
@@ -920,7 +920,6 @@ const socket = io('https://gmv-server.onrender.com');
 
         const remoteDiv = document.querySelector('.remote');
         if (remoteDiv) {
-            // USAMOS .style.background PARA SOBRESCRIBIR EL GRADIENTE
             remoteDiv.style.background = `hsl(${280 + average}, 40%, ${15 + average / 4}%)`;
             remoteDiv.style.boxShadow = `0 0 ${average}px hsl(${280 + average}, 100%, 50%), 0 20px 60px rgba(0,0,0,0.8)`;
         }
@@ -928,7 +927,10 @@ const socket = io('https://gmv-server.onrender.com');
     }
 
     async function startVoiceControl() {
-        if (!recognition) return;
+        if (!recognition) {
+            alert('Tu navegador no soporta reconocimiento de voz');
+            return;
+        }
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -940,7 +942,6 @@ const socket = io('https://gmv-server.onrender.com');
 
             document.getElementById('voice-trigger-btn').classList.add('active');
             
-            // Pausamos la animación de la marquesina para que el texto sea legible
             const marquee = document.getElementById('current-track-name');
             marquee.style.animation = 'none';
             marquee.style.paddingLeft = '0';
@@ -948,68 +949,84 @@ const socket = io('https://gmv-server.onrender.com');
 
             recognition.start();
             visualize();
-        } catch (err) { console.error(err); }
+        } catch (err) { 
+            console.error('Error al acceder al micrófono:', err);
+            alert('No se pudo acceder al micrófono. Verifica los permisos.');
+        }
     }
 
-recognition.onresult = (event) => {
-    const command = event.results[0][0].transcript.toLowerCase().trim();
-    const marquee = document.getElementById('current-track-name');
-    marquee.innerText = ">> " + command.toUpperCase();
-    
-    console.log("Comando detectado:", command);
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
 
-    // Comandos específicos
-    if (command.includes("next") || command.includes("siguiente")) {
-        send('next');
-        marquee.innerText = "NEXT TRACK >";
-    }
-    else if (command.includes("previous") || command.includes("anterior") || command.includes("back")) {
-        send('prev');
-        marquee.innerText = "< PREVIOUS TRACK";
-    }
-    else if (command.includes("pause") || command.includes("stop") || command.includes("pausar")) {
-        send('pause');
-        marquee.innerText = "|| PAUSED";
-    }
-    else if (command.includes("stats") || command.includes("estadísticas")) {
-        switchTab('stats');
-        marquee.innerText = "STATS MODE";
-    }
-    else if (command.includes("awards") || command.includes("achievement") || command.includes("logros")) {
-        switchTab('achievements');
-        marquee.innerText = "AWARDS MODE";
-    }
-    else {
-        marquee.innerText = "COMMAND NOT RECOGNIZED";
-    }
-    
-    // Vibración de feedback
-    if (navigator.vibrate) navigator.vibrate(50);
-};
+        // Procesar todos los resultados
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
 
-        // 1. Mostrar en tiempo real lo que vas diciendo (en gris para que sepa que está procesando)
         const marquee = document.getElementById('current-track-name');
+        
+        // Mostrar texto provisional mientras hablas
         if (interimTranscript) {
             marquee.innerText = "... " + interimTranscript.toUpperCase();
         }
 
-        // 2. Si ya detectó una frase final, ejecutar el comando
+        // Cuando termine de hablar, ejecutar el comando
         if (finalTranscript) {
             const command = finalTranscript.toLowerCase().trim();
             marquee.innerText = ">> " + command.toUpperCase();
-            console.log("Comando final:", command);
+            console.log("Comando detectado:", command);
 
-            if (command.includes("stats")) { send('stats'); switchTab('stats'); }
-            else if (command.includes("awards") || command.includes("achievement")) { send('achievements'); switchTab('achievements'); }
-            else if (command.includes("next")) { send('next'); }
-            else if (command.includes("previous") || command.includes("back")) { send('prev'); }
-            else if (command.includes("pause") || command.includes("stop")) { send('pause'); }
-            else if (command.includes("esc")) { send('esc'); }
+            // Comandos en español e inglés
+            if (command.includes("next") || command.includes("siguiente")) {
+                send('next');
+                marquee.innerText = "NEXT TRACK >";
+            }
+            else if (command.includes("previous") || command.includes("anterior") || command.includes("back") || command.includes("atrás")) {
+                send('prev');
+                marquee.innerText = "< PREVIOUS TRACK";
+            }
+            else if (command.includes("pause") || command.includes("stop") || command.includes("pausar") || command.includes("pausa")) {
+                send('pause');
+                marquee.innerText = "|| PAUSED";
+            }
+            else if (command.includes("stats") || command.includes("estadísticas")) {
+                switchTab('stats');
+                marquee.innerText = "STATS MODE";
+            }
+            else if (command.includes("awards") || command.includes("achievement") || command.includes("logros")) {
+                switchTab('achievements');
+                marquee.innerText = "AWARDS MODE";
+            }
+            else if (command.includes("esc") || command.includes("escape")) {
+                send('esc');
+                marquee.innerText = "ESC PRESSED";
+            }
+            else if (command.includes("volume") || command.includes("volumen")) {
+                if (command.includes("up") || command.includes("arriba") || command.includes("subir")) {
+                    send('vol-up');
+                    marquee.innerText = "VOLUME UP +";
+                } else if (command.includes("down") || command.includes("abajo") || command.includes("bajar")) {
+                    send('vol-down');
+                    marquee.innerText = "VOLUME DOWN -";
+                }
+            }
+            else {
+                marquee.innerText = "COMMAND NOT RECOGNIZED";
+            }
+            
+            // Vibración de feedback
+            if (navigator.vibrate) navigator.vibrate(50);
         }
     };
 
-recognition.onerror = (event) => {
-        document.getElementById('current-track-name').innerText = "ERROR: " + event.error.toUpperCase();
+    recognition.onerror = (event) => {
+        const marquee = document.getElementById('current-track-name');
+        marquee.innerText = "ERROR: " + event.error.toUpperCase();
         console.error("Speech Error:", event.error);
     };
 
@@ -1018,14 +1035,12 @@ recognition.onerror = (event) => {
         cancelAnimationFrame(animationId);
         if (audioContext) audioContext.close();
 
-        // Restauramos el cuadro gris a su estado original
         const remoteDiv = document.querySelector('.remote');
         if (remoteDiv) {
             remoteDiv.style.background = "linear-gradient(145deg, #1a1a1a, #0f0f0f)";
             remoteDiv.style.boxShadow = "0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)";
         }
 
-        // Restauramos la animación de la marquesina después de 2 segundos
         setTimeout(() => {
             const marquee = document.getElementById('current-track-name');
             marquee.style.animation = 'marquee-led 10s linear infinite';
