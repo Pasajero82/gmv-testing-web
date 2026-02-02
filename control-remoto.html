@@ -903,7 +903,7 @@ const socket = io('https://gmv-server.onrender.com');
     let recognition;
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'es-ES'; // Español de México
+        recognition.lang = 'en-US';
 	recognition.continuous = false;
 	recognition.interimResults = false;
         recognition.maxAlternatives = 5;
@@ -972,15 +972,15 @@ recognition.onresult = (event) => {
     alert("Detecté: " + transcript);
     
     // Comandos
-    if (command.includes("next") || command.includes("siguiente")) {
-        send('next');
-    }
-    else if (command.includes("previous") || command.includes("anterior")) {
-        send('prev');
-    }
-    else if (command.includes("pause") || command.includes("pausa")) {
-        send('pause');
-    }
+if (command.includes("next")) {
+    send('next');
+}
+else if (command.includes("previous") || command.includes("back")) {
+    send('prev');
+}
+else if (command.includes("pause") || command.includes("stop")) {
+    send('pause');
+}
 };
 
 recognition.onerror = (event) => {
