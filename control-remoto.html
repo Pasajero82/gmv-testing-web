@@ -949,9 +949,10 @@ async function startVoiceControl() {
         marquee.style.animation = 'none';
         marquee.style.paddingLeft = '0';
         marquee.innerText = "LISTENING...";
-
+	
+	visualize();
         recognition.start();
-        visualize();
+        
     } catch(e) {
         alert("Error: " + e.message);
     }
