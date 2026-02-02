@@ -949,8 +949,13 @@ const socket = io('https://gmv-server.onrender.com');
             marquee.style.paddingLeft = '0';
             marquee.innerText = "LISTENING...";
 
-            recognition.start();
-            visualize();
+            try {
+    recognition.start();
+    alert("Micrófono iniciado - HABLA AHORA");
+    visualize();
+} catch(e) {
+    alert("Error al iniciar: " + e.message);
+}
         } catch (err) { 
             console.error('Error al acceder al micrófono:', err);
             alert('No se pudo acceder al micrófono. Verifica los permisos.');
@@ -978,11 +983,11 @@ recognition.onresult = (event) => {
     }
 };
 
-    recognition.onerror = (event) => {
-        const marquee = document.getElementById('current-track-name');
-        marquee.innerText = "ERROR: " + event.error.toUpperCase();
-        console.error("Speech Error:", event.error);
-    };
+recognition.onerror = (event) => {
+    alert("ERROR DE VOZ: " + event.error);
+    const marquee = document.getElementById('current-track-name');
+    marquee.innerText = "ERROR: " + event.error.toUpperCase();
+};
 	recognition.onspeechend = () => {
     console.log("Dejaste de hablar, procesando...");
 };
