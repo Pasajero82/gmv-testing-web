@@ -988,13 +988,16 @@ recognition.onerror = (event) => {
     const marquee = document.getElementById('current-track-name');
     marquee.innerText = "ERROR: " + event.error.toUpperCase();
 };
-	recognition.onspeechend = () => {
-    console.log("Dejaste de hablar, procesando...");
+recognition.onspeechstart = () => {
+    alert("DETECTÉ QUE EMPEZASTE A HABLAR!");
+};
+
+recognition.onspeechend = () => {
+    alert("DETECTÉ QUE DEJASTE DE HABLAR!");
 };
 
 recognition.onnomatch = () => {
-    document.getElementById('current-track-name').innerText = "NO MATCH - TRY AGAIN";
-    console.log("No se reconoció el comando");
+    alert("NO ENTENDÍ LO QUE DIJISTE");
 };
     recognition.onend = () => {
         document.getElementById('voice-trigger-btn').classList.remove('active');
