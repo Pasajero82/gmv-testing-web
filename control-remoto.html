@@ -906,7 +906,7 @@ if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.lang = 'es-MX';
     recognition.continuous = false;
-    recognition.interimResults = true;
+    recognition.interimResults = false;
 } else {
     alert("Tu navegador no soporta reconocimiento de voz");
 }
