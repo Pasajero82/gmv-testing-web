@@ -934,15 +934,8 @@ if (SpeechRecognition) {
             alert('Tu navegador no soporta reconocimiento de voz');
             return;
         }
-	console.log("Iniciando reconocimiento de voz...");
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaStreamSource(stream);
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 64;
-            source.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+
 
             document.getElementById('voice-trigger-btn').classList.add('active');
             
@@ -955,8 +948,7 @@ if (SpeechRecognition) {
     recognition.start();
     alert("Micrófono iniciado - HABLA AHORA");
   
-} catch(e) {
-    alert("Error al iniciar: " + e.message);
+} 
 }
         } catch (err) { 
             console.error('Error al acceder al micrófono:', err);
