@@ -1020,7 +1020,106 @@ if (data.cmd === 'update-user-data') {
         room: roomID 
     });
 }	
+// 1. Preparamos el "oído" del navegador
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
 
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // Escuchará en inglés como tu app
+    recognition.continuous = false; // Se detiene cuando dejas de hablar
+    recognition.interimResults = false; // Solo nos da el resultado final
+} else {
+    alert("Voice control is not supported in this browser.");
+}
+
+//2 VARIABLES PARA EL SONIDO (Nuevas)
+let audioContext;
+let analyser;
+let dataArray;
+let animationId;
+
+// AYUDANTE DE COLORES (Nuevo)
+function visualize() {
+    if (!analyser) return;
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i];
+    }
+    let average = sum / dataArray.length;
+    // Esto mueve los colores según tu voz
+    document.body.style.background = `hsl(${280 + average}, 70%, ${average / 4}%)`;
+    animationId = requestAnimationFrame(visualize);
+}
+
+// TU NUEVA FUNCIÓN PASO 2 (Sustituye a la anterior)
+async function startVoiceControl() {
+    if (!recognition) return;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const btn = document.getElementById('voice-trigger-btn');
+        if (btn) btn.classList.add('active');
+
+        recognition.start(); 
+        visualize(); // <-- Aquí arrancan los colores
+    } catch (err) {
+        console.error("Error con el micro:", err);
+    }
+}
+// 3. Qué pasa cuando el navegador termina de procesar tu voz
+recognition.onresult = (event) => {
+    // Convertimos lo que dijiste a letras y lo ponemos en minúsculas
+    const command = event.results[0][0].transcript.toLowerCase();
+    console.log("Command received:", command);
+
+    // Lógica de comandos: Si dices la palabra, se ejecuta la función
+    if (command.includes("stats")) {
+        send('stats');
+        switchTab('stats');
+    } 
+    else if (command.includes("awards") || command.includes("achievements")) {
+        send('achievements');
+        switchTab('achievements');
+    } 
+    else if (command.includes("next")) {
+        send('next');
+    } 
+    else if (command.includes("previous") || command.includes("back")) {
+        send('prev');
+    } 
+    else if (command.includes("pause") || command.includes("stop")) {
+        send('pause');
+    } 
+    else if (command.includes("esc") || command.includes("escape")) {
+        send('esc');
+    }
+    else {
+        // Aquí es donde en el futuro buscaremos canciones por nombre
+        console.log("Not a command, future search for:", command);
+    }
+};
+
+// TU NUEVO PASO 4 (Sustituye al anterior)
+recognition.onend = () => {
+    const btn = document.getElementById('voice-trigger-btn');
+    if (btn) btn.classList.remove('active');
+    
+    // Apagamos la animación y el micro para no gastar batería
+    cancelAnimationFrame(animationId);
+    if (audioContext) audioContext.close();
+    
+    // Fondo negro de vuelta
+    document.body.style.background = "#0a0a0a";
+    console.log("Visualizer OFF");
+};
     </script>
 </body>
 </html>
