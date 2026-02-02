@@ -640,15 +640,22 @@
 .heart-pulse {
     position: fixed;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 8rem;
+    font-size: 5rem; /* Tamaño base para que la forma sea clara */
     pointer-events: none;
     z-index: 9999;
-    animation: heartExpand 2s ease-out forwards;
+    animation: heartExpand 1.8s ease-out forwards;
 }
 
 @keyframes heartExpand {
-    0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0.9; }
-    100% { transform: translate(-50%, -50%) scale(250); opacity: 0; }
+    0% { 
+        transform: translate(-50%, -50%) scale(0.2); 
+        opacity: 0.9; 
+    }
+    100% { 
+        /* Escala de 15 a 20 es suficiente para cubrir un celular manteniendo la forma */
+        transform: translate(-50%, -50%) scale(18); 
+        opacity: 0; 
+    }
 }
 
     </style>
