@@ -965,23 +965,17 @@ if (SpeechRecognition) {
     }
 
 recognition.onresult = (event) => {
-    for (let i = 0; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        const confidence = event.results[i][0].confidence;
-        
-        alert("Escuché: " + transcript + " (confianza: " + confidence + ")");
-        
-        const command = transcript.toLowerCase().trim();
-        
-        if (command.includes("next")) {
-            send('next');
-        }
-        else if (command.includes("previous") || command.includes("back")) {
-            send('prev');
-        }
-        else if (command.includes("pause") || command.includes("stop")) {
-            send('pause');
-        }
+    const transcript = event.results[0][0].transcript;
+    const command = transcript.toLowerCase().trim();
+    
+    if (command.includes("next")) {
+        send('next');
+    }
+    else if (command.includes("previous") || command.includes("back")) {
+        send('prev');
+    }
+    else if (command.includes("pause") || command.includes("stop")) {
+        send('pause');
     }
 };
 
