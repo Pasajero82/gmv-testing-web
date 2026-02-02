@@ -905,6 +905,7 @@ const socket = io('https://gmv-server.onrender.com');
         recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
         recognition.continuous = false;
+	recognition.interimResults = true;
     }
 
     let audioContext, analyser, dataArray, animationId;
@@ -949,16 +950,42 @@ const socket = io('https://gmv-server.onrender.com');
         } catch (err) { console.error(err); }
     }
 
-    recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase().trim();
-        document.getElementById('current-track-name').innerText = ">> " + command.toUpperCase();
+recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
 
-        if (command.includes("stats")) { send('stats'); switchTab('stats'); }
-        else if (command.includes("awards") || command.includes("achievement")) { send('achievements'); switchTab('achievements'); }
-        else if (command.includes("next")) { send('next'); }
-        else if (command.includes("previous") || command.includes("back")) { send('prev'); }
-        else if (command.includes("pause") || command.includes("stop")) { send('pause'); }
-        else if (command.includes("esc")) { send('esc'); }
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+
+        // 1. Mostrar en tiempo real lo que vas diciendo (en gris para que sepa que está procesando)
+        const marquee = document.getElementById('current-track-name');
+        if (interimTranscript) {
+            marquee.innerText = "... " + interimTranscript.toUpperCase();
+        }
+
+        // 2. Si ya detectó una frase final, ejecutar el comando
+        if (finalTranscript) {
+            const command = finalTranscript.toLowerCase().trim();
+            marquee.innerText = ">> " + command.toUpperCase();
+            console.log("Comando final:", command);
+
+            if (command.includes("stats")) { send('stats'); switchTab('stats'); }
+            else if (command.includes("awards") || command.includes("achievement")) { send('achievements'); switchTab('achievements'); }
+            else if (command.includes("next")) { send('next'); }
+            else if (command.includes("previous") || command.includes("back")) { send('prev'); }
+            else if (command.includes("pause") || command.includes("stop")) { send('pause'); }
+            else if (command.includes("esc")) { send('esc'); }
+        }
+    };
+
+recognition.onerror = (event) => {
+        document.getElementById('current-track-name').innerText = "ERROR: " + event.error.toUpperCase();
+        console.error("Speech Error:", event.error);
     };
 
     recognition.onend = () => {
