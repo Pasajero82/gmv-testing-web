@@ -636,28 +636,6 @@
 .vote-btn.down.voted svg { 
     fill: #ff0055 !important; /* El icono se pone rosa */
 }
-
-.heart-pulse {
-    position: fixed;
-    transform: translate(-50%, -50%) scale(0);
-    font-size: 5rem; /* Tamaño base para que la forma sea clara */
-    pointer-events: none;
-    z-index: 9999;
-    animation: heartExpand 3s ease-out forwards;
-}
-
-@keyframes heartExpand {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.2); 
-        opacity: 0.9; 
-    }
-    100% { 
-        /* Escala de 15 a 20 es suficiente para cubrir un celular manteniendo la forma */
-        transform: translate(-50%, -50%) scale(8); 
-        opacity: 0; 
-    }
-}
-
     </style>
 </head>
 <body>
@@ -857,24 +835,13 @@ const socket = io('https://gmv-server.onrender.com');
         if (navigator.vibrate) navigator.vibrate(35);
     }
 
-function toggleFavLocal() {
-    const favBtn = document.querySelector('.func-btn.fav');
-    if (!favBtn) return;
-    
-    // Cambiamos el estado visual del botón
-    favBtn.classList.toggle('is-favorite');
-    
-    // DISPARADOR: Solo si el botón se acaba de activar, lanzamos la ráfaga masiva
-    if (favBtn.classList.contains('is-favorite')) {
-        createHeartBurst(favBtn);
+    function toggleFavLocal() {
+        const favBtn = document.querySelector('.func-btn.fav');
+        if (!favBtn) return;
+        favBtn.classList.toggle('is-favorite');
+        if (navigator.vibrate) navigator.vibrate(50);
+        send('favorite');
     }
-    
-    // Feedback táctil (vibración)
-    if (navigator.vibrate) navigator.vibrate(50);
-    
-    // Enviamos la señal al servidor/canal
-    send('favorite');
-}
 
     function openKeyboard() {
         document.getElementById('keyboardOverlay').classList.add('show');
@@ -1115,36 +1082,6 @@ recognition.onerror = (event) => {
                 pagination.appendChild(dot);
             }
         }
-function createHeartBurst(btn) {
-    // Calculamos el centro exacto del botón en la pantalla
-    const rect = btn.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    // Lista de colores para las diferentes tonalidades
-    const colors = ['#ff0055', '#ff3377', '#ff6699', '#ff0000', '#e60073'];
-
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const heart = document.createElement('span');
-            heart.className = 'heart-pulse';
-            heart.innerHTML = '❤️';
-            
-            // Posicionamos el corazón en el centro del botón
-            heart.style.left = centerX + 'px';
-            heart.style.top = centerY + 'px';
-            
-            // Asignamos una tonalidad distinta de la lista
-            heart.style.color = colors[i % colors.length];
-            
-            // IMPORTANTE: Lo pegamos al body para que crezca sin límites
-            document.body.appendChild(heart);
-            
-            // Lo eliminamos después de 2 segundos (tiempo de la animación)
-            setTimeout(() => heart.remove(), 2000);
-        }, i * 250); // El retraso de 250ms crea el efecto de ondas seguidas
-    }
-}
     </script>
 </body>
 </html>
