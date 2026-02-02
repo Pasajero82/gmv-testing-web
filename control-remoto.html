@@ -780,10 +780,13 @@
             </div>
 
 	<div class="tab-pane" id="tab-achievements">
-    <div id="remote-achievements-container" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; min-height: 200px;">
+    <div id="ach-pages-container-remote" style="min-height: 200px;">
         <div class="stat-item">
             <span class="stat-label">WAITING FOR SIGNAL...</span>
         </div>
+    </div>
+    
+    <div id="ach-pagination-remote" style="display: flex; justify-content: center; gap: 20px; margin-top: 15px;">
     </div>
 </div>
 
@@ -883,7 +886,6 @@ const socket = io('https://gmv-server.onrender.com');
             document.getElementById('remote-time').innerText = data.watchTime;
             document.getElementById('remote-streak').innerText = data.streak + " days";
             document.getElementById('remote-level-stats').innerText = data.level;
-	    if (data.achievements) renderAchievementsRemote(data.achievements);
             const favBtn = document.querySelector('.func-btn.fav');
             if (favBtn) data.isFavorite ? favBtn.classList.add('is-favorite') : favBtn.classList.remove('is-favorite');
         }
@@ -1041,21 +1043,6 @@ recognition.onerror = (event) => {
         btnDown.classList.add('disabled');
         socket.emit('enviar-comando', { cmd: 'vote', voteType: type, room: roomID });
     }
-function renderAchievementsRemote(achievements) {
-    const container = document.getElementById('remote-achievements-container');
-    if (!container) return; 
-
-    container.innerHTML = ''; 
-
-    achievements.forEach(ach => {
-        const achElement = document.createElement('div');
-        achElement.className = 'achievement-icon';
-        achElement.title = ach.name; 
-        achElement.innerHTML = `<span>${ach.icon || '🏆'}</span>`; 
-        
-        container.appendChild(achElement);
-    });
-}
     </script>
 </body>
 </html>
