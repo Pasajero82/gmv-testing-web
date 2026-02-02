@@ -3426,9 +3426,6 @@ if (event.key === '4') {
 function loadNewsFeed() {
             const ticker = document.getElementById('newsTicker');
             
-            // Creamos el texto de YouTube
-            const ytLabel = "<span style='color: #666; font-weight: 900; letter-spacing: 1px;'>[ BROADCAST VIA YOUTUBE API ]</span>";
-            
             if (typeof newsItems !== 'undefined' && newsItems.length > 0) {
                 // CAMBIO: Ahora las noticias van primero y el texto de YouTube al FINAL
                 ticker.innerHTML = newsItems.join(' <span>●</span> ') + " &nbsp;&nbsp;&nbsp;&nbsp; " + ytLabel;
