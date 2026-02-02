@@ -636,28 +636,19 @@
 .vote-btn.down.voted svg { 
     fill: #ff0055 !important; /* El icono se pone rosa */
 }
-/* Estilo para los corazones del pulso concéntrico */
+
 .heart-pulse {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: fixed;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 2rem;
-    pointer-events: none; /* Evita que el corazón bloquee clics en el botón */
-    z-index: 10;
-    animation: heartExpand 1.5s ease-out forwards;
+    font-size: 8rem;
+    pointer-events: none;
+    z-index: 9999;
+    animation: heartExpand 2s ease-out forwards;
 }
 
-/* Definición de la animación de expansión */
 @keyframes heartExpand {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.5); 
-        opacity: 0.8; 
-    }
-    100% { 
-        transform: translate(-50%, -50%) scale(4); 
-        opacity: 0; 
-    }
+    0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(250); opacity: 0; }
 }
 
     </style>
@@ -863,14 +854,18 @@ function toggleFavLocal() {
     const favBtn = document.querySelector('.func-btn.fav');
     if (!favBtn) return;
     
+    // Cambiamos el estado visual del botón
     favBtn.classList.toggle('is-favorite');
     
-    // Si se activa el favorito, disparamos los corazones
+    // DISPARADOR: Solo si el botón se acaba de activar, lanzamos la ráfaga masiva
     if (favBtn.classList.contains('is-favorite')) {
         createHeartBurst(favBtn);
     }
     
+    // Feedback táctil (vibración)
     if (navigator.vibrate) navigator.vibrate(50);
+    
+    // Enviamos la señal al servidor/canal
     send('favorite');
 }
 
@@ -1114,17 +1109,33 @@ recognition.onerror = (event) => {
             }
         }
 function createHeartBurst(btn) {
-    const colors = ['#ff0055', '#ff3377', '#ff6699', '#ff0000'];
+    // Calculamos el centro exacto del botón en la pantalla
+    const rect = btn.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Lista de colores para las diferentes tonalidades
+    const colors = ['#ff0055', '#ff3377', '#ff6699', '#ff0000', '#e60073'];
+
     for (let i = 0; i < 5; i++) {
         setTimeout(() => {
             const heart = document.createElement('span');
             heart.className = 'heart-pulse';
             heart.innerHTML = '❤️';
-            heart.style.color = colors[i % colors.length];
-            btn.appendChild(heart);
             
-            setTimeout(() => heart.remove(), 1500);
-        }, i * 250);
+            // Posicionamos el corazón en el centro del botón
+            heart.style.left = centerX + 'px';
+            heart.style.top = centerY + 'px';
+            
+            // Asignamos una tonalidad distinta de la lista
+            heart.style.color = colors[i % colors.length];
+            
+            // IMPORTANTE: Lo pegamos al body para que crezca sin límites
+            document.body.appendChild(heart);
+            
+            // Lo eliminamos después de 2 segundos (tiempo de la animación)
+            setTimeout(() => heart.remove(), 2000);
+        }, i * 250); // El retraso de 250ms crea el efecto de ondas seguidas
     }
 }
     </script>
