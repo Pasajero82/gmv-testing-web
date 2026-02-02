@@ -953,30 +953,31 @@ recognition.onresult = (event) => {
     
     marquee.innerText = ">> " + transcript.toUpperCase();
 
-// A. RANKING (Incluye "top diez" y "top 10")
-else if (command.includes("ranking") || command.includes("top diez") || command.includes("top 10") || command.includes("tabla")) { 
-    send('top-10'); 
-    marquee.innerText = "✓ RANKING ON PC"; 
-}
+    // 1. RANKING (Corregido a "if" para que no rompa el código)
+    if (command.includes("ranking") || command.includes("top diez") || command.includes("top 10") || command.includes("tabla")) { 
+        send('top-10'); 
+        marquee.innerText = "✓ RANKING ON PC"; 
+    }
 
-// B. UI (Ocultar/Mostrar controles)
-else if (command.includes("minimizar") || command.includes("ocultar") || command.includes("mostrar") || command.includes("ver controles")) { 
-    send('minimize'); 
-    marquee.innerText = "✓ UI TOGGLED"; 
-}
-// C. COMPARTIR
-else if (command.includes("compartir") || command.includes("redes") || command.includes("enviar")) { 
-    send('share'); 
-    marquee.innerText = "✓ SHARE MENU ON PC"; 
-}
+    // 2. UI (Ocultar/Mostrar controles)
+    else if (command.includes("minimizar") || command.includes("ocultar") || command.includes("mostrar") || command.includes("ver controles")) { 
+        send('minimize'); 
+        marquee.innerText = "✓ UI TOGGLED"; 
+    }
 
-    // 2. REPRODUCIR FAVORITOS (PLAY ALL)
+    // 3. COMPARTIR
+    else if (command.includes("compartir") || command.includes("redes") || command.includes("enviar")) { 
+        send('share'); 
+        marquee.innerText = "✓ SHARE MENU ON PC"; 
+    }
+
+    // 4. REPRODUCIR FAVORITOS
     else if (command.includes("reproducir favoritos") || command.includes("pon mis favoritos")) {
         send('play-favs'); 
         marquee.innerText = "✓ PLAYING FAVS";
     }
 
-    // 3. VOTOS (NEGATIVOS PRIMERO)
+    // 5. VOTOS
     else if (command.includes("no me gusta") || command.includes("dislike") || command.includes("odio")) {
         processVote('down');
         marquee.innerText = "✓ DISLIKE";
@@ -986,7 +987,7 @@ else if (command.includes("compartir") || command.includes("redes") || command.i
         marquee.innerText = "✓ LIKE";
     }
 
-    // 4. FAVORITOS (MENÚ VISUAL)
+    // 6. FAVORITOS
     else if (command.includes("lista") || command.includes("ver favoritos") || command.includes("mostrar favoritos")) {
         send('fav-menu'); 
         marquee.innerText = "✓ FAV LIST";
@@ -996,26 +997,30 @@ else if (command.includes("compartir") || command.includes("redes") || command.i
         marquee.innerText = "✓ FAV UPDATED";
     }
 
-    // 5. SILENCIO (MUTE)
-else if (command.includes("silencio") || command.includes("mute") || command.includes("callar")) {
-    send('mute');
-    marquee.innerText = "✓ MUTE TOGGLED";
-}
+    // 7. SILENCIO
+    else if (command.includes("silencio") || command.includes("mute") || command.includes("callar")) {
+        send('mute');
+        marquee.innerText = "✓ MUTE TOGGLED";
+    }
 
-    // 6. NAVEGACIÓN Y OTROS
+    // 8. NAVEGACIÓN Y PANELES
     else if (command.includes("siguiente") || command.includes("next")) { send('next'); }
     else if (command.includes("anterior") || command.includes("atrás")) { send('prev'); }
     else if (command.includes("pausa") || command.includes("play") || command.includes("pause")) { send('pause'); }
-    else if (command.includes("recompensa") || command.includes("bóveda") || command.includes("vault")) { send('rewards'); switchTab('vault'); }
-else if (command.includes("logros") || command.includes("awards") || command.includes("logro")) { 
-    send('achievements'); // Esto es como pulsar el [3] en la PC
-    marquee.innerText = "✓ AWARDS ON PC"; }
-    else if (command.includes("estadística") || command.includes("stats")) { send('stats'); switchTab('stats'); }
+    else if (command.includes("recompensa") || command.includes("bóveda") || command.includes("vault")) { send('rewards'); }
+    else if (command.includes("logros") || command.includes("awards") || command.includes("logro")) { 
+        send('achievements'); 
+        marquee.innerText = "✓ AWARDS ON PC"; 
+    }
+    else if (command.includes("estadística") || command.includes("stats") || command.includes("datos")) { 
+        send('stats'); 
+        marquee.innerText = "✓ STATS ON PC"; 
+    }
     else if (command.includes("muro") || command.includes("wall")) { send('marquee'); }
     else if (command.includes("escribir") || command.includes("mensaje")) { openKeyboard(); }
     else if (command.includes("escape") || command.includes("salir") || command.includes("cerrar")) { send('esc'); }
 
-    // 7. BÚSQUEDA POR VOZ (SI NO ES NADA DE LO ANTERIOR)
+    // 9. BÚSQUEDA POR VOZ (SI NO ES NADA DE LO ANTERIOR)
     else {
         marquee.innerText = "🔍 " + transcript.toUpperCase();
         socket.emit('enviar-comando', { cmd: 'voice-search', query: command, room: roomID });
