@@ -934,28 +934,18 @@ async function startVoiceControl() {
         return;
     }
     
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioContext.createMediaStreamSource(stream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 64;
-        source.connect(analyser);
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        
-        document.getElementById('voice-trigger-btn').classList.add('active');
-        
-        const marquee = document.getElementById('current-track-name');
-        marquee.style.animation = 'none';
-        marquee.style.paddingLeft = '0';
-        marquee.innerText = "LISTENING...";
-	
-	visualize();
-        recognition.start();
-        
-    } catch(e) {
-        alert("Error: " + e.message);
-    }
+    document.getElementById('voice-trigger-btn').classList.add('active');
+
+const marquee = document.getElementById('current-track-name');
+marquee.style.animation = 'none';
+marquee.style.paddingLeft = '0';
+marquee.innerText = "LISTENING...";
+
+try {
+    recognition.start();
+} catch(e) {
+    alert("Error: " + e.message);
+}
 }
 
 recognition.onresult = (event) => {
