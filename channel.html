@@ -411,6 +411,24 @@ body {
     position: relative;
 }
 
+/* Estas letras dicen cómo se debe ver el corazón */
+.heart-svg-icon {
+    width: 24px;
+    height: 24px;
+    fill: none; 
+    stroke: var(--text-secondary);
+    stroke-width: 2;
+    transition: transform 0.2s, fill 0.3s;
+    display: block;
+}
+
+/* Estas letras dicen que el corazón se pinte de rosa cuando te guste la canción */
+.heart-svg-icon.favorited {
+    fill: var(--primary);
+    stroke: var(--primary);
+    filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
 .fav-menu-btn-top::before,
 .qr-btn-top::before {
     content: '';
@@ -953,7 +971,7 @@ input[type=range]::-moz-range-thumb:hover {
     border-radius: var(--radius-lg);
     padding: 12px 16px;
     z-index: 80;
-    width: 240px;
+    width: 230px;
     font-family: inherit;
     box-shadow: var(--shadow-xl);
     transform: translateY(-20px);
@@ -2190,7 +2208,11 @@ body.clean-mode .promo-card {
         <div class="qr-btn-top" onclick="toggleQRDesdeIcono()" title="Mostrar QR">
             <svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2 2h2v2h-2v-2zM13 15h2v2h-2v-2zm2 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2 2h2v2h-2v-2z"/></svg>
         </div>
-        <div class="fav-menu-btn-top" onclick="toggleFavMenu()">★</div>
+	<div class="fav-menu-btn-top" onclick="toggleFavMenu()" title="Open Favorites">
+    <svg viewBox="0 0 24 24" class="heart-svg-icon" id="favHeartBtn" onclick="event.stopPropagation(); toggleFavorite();">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+</div>
     </div>
 </div>
 
@@ -2205,8 +2227,6 @@ body.clean-mode .promo-card {
         <div class="bottom-controls-bar" id="controlsBar" style="display:none;">
             <div class="left-group">
                 <div class="interaction-container">
-                    <div class="action-icon-btn" id="favBtn" onclick="toggleFavorite()" title="Save to Favorites">★</div>
-                </div>
                 <div class="social-container" id="topSocialLinks"></div>
             </div>
             <div class="center-group">
