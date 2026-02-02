@@ -1,402 +1,730 @@
-<!DOCTYPE html><html lang="es"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DREAM ON V1: By Mara Prompts</title>
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <title>GMV | GENERATIVE MUSIC VIDEO</title>
+
+    <meta name="description" content="GMV is the world's first decentralized generative music video network. 24/7 AI-powered visuals and the ultimate MTV aesthetic.">
+    <meta name="keywords" content="Generative Music Video, AI Music, Neural Art, GMV, MTV Aesthetic">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="GMV | GENERATIVE MUSIC VIDEO">
+    <meta property="og:description" content="The 24/7 decentralized network for AI-powered music videos. Visuals never stop, music never ends.">
+    <meta property="og:image" content="https://gmvchannel.netlify.app/img/ban4.webp">
+    <meta property="og:url" content="https://gmvchannel.netlify.app/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://gmvchannel.netlify.app/img/ban4.webp">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syncopate:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS BASE --- */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --primary: #ff0055;
+            --secondary: #00f3ff;
+            --bg-dark: #050505;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg-dark); color: #f1f5f9; font-family: 'Space Grotesk', sans-serif; }
         
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Courier New', Courier, monospace;
-            height: 100dvh;
-            margin: 0;
+        .text-glow-pink { text-shadow: 0 0 10px rgba(255, 0, 127, 0.8); }
+        .neon-shadow-pink { box-shadow: 0 0 20px rgba(255, 0, 127, 0.6), 0 0 40px rgba(255, 0, 127, 0.2); }
+        
+        .panoramic-header {
+            aspect-ratio: 21 / 9;
+            width: 100%;
+            position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: background-color 0.1s ease-out;
-        }
-
-        #bg-canvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none;
-        }
-
-        /* LOGIN */
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.8s; padding: 20px;
+            background: #000;
         }
         
-        .login-icon svg {
-            width: 80px; height: 80px; fill: none; stroke: #fff; stroke-width: 1.5; margin-bottom: 20px;
-        }
+.slider-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity 1s ease-in-out;
+}
 
-        .login-label {
-            font-size: 0.9rem; letter-spacing: 3px; color: #aaa; margin-bottom: 15px; font-weight: bold;
-        }
-
-        input {
-            background: transparent; border: none; border-bottom: 2px solid #fff;
-            color: #fff; font-family: 'Courier New', monospace; font-size: 1.5rem; text-align: center;
-            width: 80%; max-width: 300px; padding: 15px; margin-bottom: 40px; outline: none;
-            text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+.slider-image.active {
+    opacity: 1;
+    transform: scale(1.35);
+    transition: opacity 1s ease-in-out, transform 25s ease-out !important;
+}
+        
+        .slide-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+	 background: linear-gradient(to top, rgba(5, 5, 5, 1) 0%, rgba(5, 5, 5, 0.2) 20%, transparent 100%);
         }
         
-        #btn-enter {
-            background: transparent; color: #fff; border: 2px solid #fff;
-            padding: 15px 40px; font-size: 1rem; cursor: pointer; letter-spacing: 3px;
-            font-weight: bold; transition: 0.3s;
-        }
-        #btn-enter:active { background: #fff; color: #000; }
-
-        #quote-container {
-            position: absolute; bottom: 40px; width: 85%; text-align: center;
-        }
-        #login-quote { font-size: 1rem; line-height: 1.4; color: #ddd; font-style: italic; margin-bottom: 10px; }
-        #login-author { font-size: 0.8rem; color: #888; text-align: right; margin-right: 20px; letter-spacing: 1px; }
-
-        /* UI */
-        .top-bar {
-            width: 100%; padding: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 10; text-shadow: 0 0 10px #000; position: relative;
-        }
-        .top-left { display: flex; flex-direction: column; }
-        h1.mini-title { font-size: 1rem; letter-spacing: 4px; margin: 0; color: #888; }
-        
-        .status-tag { font-size: 0.6rem; color: #555; margin-top: 5px; font-weight: bold; transition: color 0.3s; }
-        
-        .btn-mini {
-            background: rgba(0,0,0,0.5); border: 1px solid #444; color: #666;
-            padding: 5px 10px; font-size: 0.6rem; cursor: pointer;
-        }
-
-        /* VISUALIZADOR */
-        #eye-container {
-            flex-grow: 1; display: flex; justify-content: center; align-items: center;
-            position: relative; cursor: pointer; width: 100%; z-index: 10;
-        }
-
-        #eye-core {
-            width: 40px; height: 40px; background: #fff; border-radius: 50%;
-            border-width: 3px; border-style: solid;
-            transition: background 0.2s, box-shadow 0.1s, border-color 0.2s; 
+        .slide-overlay.active { opacity: 1; }
+             
+        .slide-text {
+            position: absolute;
+            bottom: 70px; 
+            left: 80px;
+            z-index: 10;
+            max-width: 600px;
+            opacity: 0;
         }
         
-        .ring {
-            position: absolute; border-width: 1px; border-style: solid;
-            top: 50%; left: 50%; pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: border-radius 0.5s ease; 
+        .slide-text.active {
+            animation: slideTextIn 0.8s ease-out 0.3s forwards;
         }
-
-        #status-text {
-            height: 40px; font-size: 0.7rem; color: #ccc; letter-spacing: 1px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 0px; text-align: center;
-            padding: 0 20px; z-index: 10; text-shadow: 0 0 10px #000; position: relative;
+        
+@keyframes slideTextIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+        
+        .slide-title {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #00f3ff;;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
+	    opacity: 0.7;
         }
-
-        /* DOCK */
-        .mode-dock {
-            width: 100%; padding: 20px; padding-bottom: 40px;
-            display: flex; justify-content: center; gap: 25px;
-            z-index: 10; position: relative;
-            background: linear-gradient(to top, #000 20%, transparent);
+        
+        .slide-description {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+            line-height: 1.4;
         }
-        .mode-btn {
-            background: rgba(0,0,0,0.5); border: 1px solid #444; color: #555;
-            width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.3s; cursor: pointer;
+        
+.slide-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    width: 0;
+    z-index: 30;
+}
+
+.slide-progress.active { 
+    width: 100%; 
+    transition: width 8s linear; /* La transición SOLO cuando está activa */
+}
+        
+        .slide-indicator {
+            width: 48px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.5s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
-        .mode-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-        .mode-btn.active { transform: translateY(-10px); background: rgba(0,0,0,0.9); border-color: currentColor; box-shadow: 0 0 15px currentColor; }
+        
+        .slide-indicator.active {
+            background: var(--primary);
+            width: 64px;
+        }
+        
+        .slide-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .slide-indicator:hover::before { left: 100%; }
+        
+        .breathe-button {
+            animation: breathe 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+@keyframes breathe {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: none;
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: none;
+            }
+        }
+        
+        .breathe-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .breathe-button:hover::before { left: 100%; }
+        
+        .breathe-button:hover {
+            animation: breathe 1.5s ease-in-out infinite;
+            transform: scale(1.08);
+        }
+        
+.feature-card {
+    border: 2px solid rgba(255, 0, 127, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.4), 0 0 30px rgba(255, 0, 127, 0.1);
+}
 
-        /* ESTILOS POR MODO */
-        body.mode-origen { background-color: #000 !important; } 
-        body.mode-origen .active { color: #fff; }
-        body.mode-origen #eye-core { background: #000; box-shadow: 0 0 30px #fff; }
-        body.mode-origen .ring { border-color: rgba(255,255,255,0.3); border-radius: 50%; }
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 0, 127, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s;
+    z-index: 0;
+}
 
-        body.mode-ola .status-tag { color: #0ff; }
-        body.mode-ola .active { color: #0ff; }
-        body.mode-ola #eye-core { background: #000; box-shadow: 0 0 30px #0ff; }
-        body.mode-ola .ring { border-color: rgba(0,255,255,0.3); }
+.feature-card:hover::before {
+    left: 100%;
+}
 
-        body.mode-reloj .status-tag { color: #e6c200; }
-        body.mode-reloj .active { color: #e6c200; }
-        /* Fondo transparente para que el Canvas dibuje el negro detrás */
-        body.mode-reloj #eye-core { background: transparent; box-shadow: 0 0 30px #e6c200; }
-        body.mode-reloj .ring { border-color: rgba(230,194,0,0.3); border-radius: 50%; }
+.feature-card:hover {
+    background: var(--primary);
+    border-color: white;
+    box-shadow: 0 0 30px rgba(255, 0, 127, 0.8), 0 0 60px rgba(255, 0, 127, 0.4), 0 0 90px rgba(255, 0, 127, 0.2);
+    transform: scale(1.05);
+}
 
-        body.mode-locura .status-tag { color: #f00; }
-        body.mode-locura .active { color: #f00; }
-        body.mode-locura #eye-core { background: #000; box-shadow: 0 0 30px #f00; }
-        body.mode-locura .ring { border-color: rgba(255,0,0,0.3); border-style: dashed; border-radius: 50%; }
+.feature-card > * {
+    position: relative;
+    z-index: 1;
+}
+        
+.feature-icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    margin-bottom: 2rem;
+    transition: all 0.4s ease;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.4), 0 0 30px rgba(255, 0, 127, 0.1);
+    position: relative;
+    overflow: hidden;
+}
 
-    </style></head><body class="mode-origen">
+.feature-icon-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 0, 127, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s;
+}
 
-    <canvas id="bg-canvas"></canvas>
+.feature-card:hover .feature-icon-box {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 30px rgba(255, 0, 127, 0.8), 0 0 60px rgba(255, 0, 127, 0.4), 0 0 90px rgba(255, 0, 127, 0.2);
+    transform: scale(1.1);
+    border-color: white;
+}
 
-    <div id="login-screen">
-        <div class="login-icon">
-            <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="11" stroke-width="1"></circle>
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-            </svg>
+.feature-card:hover .feature-icon-box::before {
+    left: 100%;
+}
+
+@media (max-width: 768px) {
+    .slide-text {
+        bottom: 20px;
+        left: 40px;
+        right: 40px;
+    }
+    .slide-title { font-size: 1.8rem; }
+    .slide-description { font-size: 1rem; }
+}
+	/* Añade esto para que el cambio de color sea suave */
+.header-icon {
+    transition: all 0.3s ease;
+}
+
+.header-icon svg {
+    transition: all 0.3s ease;
+}
+
+.header-icon:hover svg path {
+    fill: #00f3ff;
+    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+}
+
+.header-icon:hover {
+    transform: scale(1.1);
+}
+.tooltip {
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.95);
+    color: #00f3ff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+    letter-spacing: 0.5px;
+}
+
+.header-icon:hover .tooltip {
+    opacity: 1;
+}
+
+.header-icon:nth-child(2) .tooltip {
+    left: auto;
+    right: -50px;
+    transform: translateX(0);
+}
+
+.header-icon:nth-child(3) .tooltip {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+}
+.cursor {
+    display: inline-block;
+    color: #ffffff; /* Blanco puro */
+    margin-left: 2px;
+    animation: blink 0.8s infinite;
+    font-size: 1.2rem; /* Un poco más grande para que el bloque resalte */
+    vertical-align: middle;
+    font-weight: normal;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.typing-target {
+    display: inline;
+}
+
+    </style>
+</head>
+<body>
+    <nav style="position: fixed; top: 0; width: 100%; z-index: 50; background: linear-gradient(to bottom, rgba(0,0,0,.9), transparent); backdrop-filter: blur(10px);">
+        <div style="max-width: 1600px; margin: 0 auto; padding: 0 2rem; height: 50px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-family: 'Lato', sans-serif; font-weight: 700; font-size: 1.25rem;">
+                <span style="color: var(--primary);" class="text-glow-pink">GMV |</span>
+                <span style="color: white;"> GENERATIVE MUSIC VIDEO</span>
+            </span>
+            
+<div style="display: flex; gap: 0.5rem; align-items: center;">
+    <a href="https://www.youtube.com/@GenerativeMusicVideo" target="_blank" class="header-icon" style="text-decoration: none; display: inline-block; position: relative;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 8v8l5-4-5-4zm11-5H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <span class="tooltip">Youtube Channel</span>
+    </a>
+    
+    <a href="https://ko-fi.com/generativemusicvideo/tip" target="_blank" class="header-icon" style="text-decoration: none; display: inline-block; position: relative;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <span class="tooltip">Buy a Bit for Generative Music Video</span>
+    </a>
+    
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSc-y8q0H880xqQVIHvPzkPaKyl97-U3gDIJo-VmuVXNa4V6BQ/viewform" target="_blank" class="header-icon" style="text-decoration: none; display: inline-block; position: relative;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11z" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <span class="tooltip">Upload your video</span>
+    </a>
+</div>
         </div>
-        <div class="login-label">INGRESA TU IDENTIDAD</div>
-        <input type="text" id="username" placeholder="NOMBRE" autocomplete="off">
-        <button id="btn-enter" onclick="enterApp()">ACCEDER</button>
-        
-        <div id="quote-container">
-            <div id="login-quote"></div>
-            <div id="login-author"></div>
-        </div>
-    </div>
+    </nav>
 
-    <div class="top-bar">
-        <div class="top-left">
-            <h1 class="mini-title">DREAM ON</h1>
-            <div id="status-tag" class="status-tag">● V21: BASE</div>
-        </div>
-        <button class="btn-mini" onclick="toggleFullScreen()">[ FULLSCREEN ]</button>
-    </div>
+<main style="margin-top: 35px;">
+        <header class="panoramic-header">
+            <div style="position: absolute; inset: 0; z-index: 0;">
+                <div class="slide-progress" id="slide-progress"></div>
+                
+<div class="slider-image" style="background-image: url('img/ban1.webp');"></div>
+<div class="slide-overlay"></div>
+<div class="slide-text active">
+    <h3 class="slide-title">Swallowed by a Black Hole</h3>
+    <p class="slide-description"><span class="typing-target" data-text="RECOVERED ARCHIVES: 1994 MISSION [CLASSIFIED] They spoke to us for thirty years. No one answered. It is time to listen."></span><span class="cursor">█</span></p>
+</div>
 
-    <div id="eye-container" onclick="togglePlayStop()">
-        <div class="ring" style="width: 200px; height: 200px;"></div>
-        <div class="ring" style="width: 140px; height: 140px;"></div>
-        <div id="eye-core"></div>
-    </div>
+<div class="slider-image" style="background-image: url('img/ban2.webp');"></div>
+<div class="slide-overlay"></div>
+<div class="slide-text">
+    <h3 class="slide-title">The Mannequins</h3>
+    <p class="slide-description"><span class="typing-target" data-text="Swedish Indie Pop / New Wave / Synth Rock trio burst onto the scene with their single: Dollhouse."></span><span class="cursor">█</span></p>
+</div>
 
-    <div id="status-text">TOCA EL CENTRO PARA INICIAR</div>
+<div class="slider-image" style="background-image: url('img/ban3.webp');"></div>
+<div class="slide-overlay"></div>
+<div class="slide-text">
+    <h3 class="slide-title">Dr. Dreams</h3>
+    <p class="slide-description"><span class="typing-target" data-text="Dr. Dreams is a composer and producer. His songs, 'Instant Replay' and 'U R All I Need', are all you need to dream."></span><span class="cursor">█</span></p>
+</div>
 
-    <div class="mode-dock">
-        <button class="mode-btn active" onclick="switchMode('origen')" id="btn-origen"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="2" fill="currentColor"></circle></svg></button>
-        <button class="mode-btn" onclick="switchMode('ola')" id="btn-ola"><svg viewBox="0 0 24 24"><path d="M2 12c2 0 2-5 4-5s2 5 4 5 2-5 4-5 2 5 4 5 2-5 4-5"></path><path d="M2 17c2 0 2-5 4-5s2 5 4 5 2-5 4-5 2 5 4 5 2-5 4-5" opacity="0.5"></path></svg></button>
-        <button class="mode-btn" onclick="switchMode('reloj')" id="btn-reloj"><svg viewBox="0 0 24 24"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg></button>
-        <button class="mode-btn" onclick="switchMode('locura')" id="btn-locura"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
-    </div>
+<div class="slider-image" style="background-image: url('img/ban4.webp');"></div>
+<div class="slide-overlay"></div>
+<div class="slide-text">
+    <h3 class="slide-title">N E X O</h3>
+    <p class="slide-description"><span class="typing-target" data-text="GLITCHGRID collective / AI-trap pioneer. Born from a server crash. Metroplex, 2045. Transmission incoming."></span><span class="cursor">█</span></p>
+</div>
+
+<div class="slider-image" style="background-image: url('img/ban5.webp');"></div>
+<div class="slide-overlay"></div>
+<div class="slide-text">
+    <h3 class="slide-title">Ferber</h3>
+    <p class="slide-description"><span class="typing-target" data-text="Slacker Rock / Lo-Fi Indie. The garbage of everyday life is transformed into poetry, in the lyrics of the new urban poet."></span><span class="cursor">█</span></p>
+</div>
+
+<div class="slider-image" style="background-image: url('img/ban6.webp');"></div>
+<div class="slide-overlay"></div>
+<div class="slide-text">
+    <h3 class="slide-title">Sirock</h3>
+    <p class="slide-description"><span class="typing-target" data-text="The new contender for the reign of emotional rock arrives with furious energy to claim the throne."></span><span class="cursor">█</span></p>
+</div>
+
+            <div style="position: absolute; bottom: 24px; right: 32px; display: flex; gap: 12px; z-index: 20;">
+                <div class="slide-indicator active"></div>
+                <div class="slide-indicator"></div>
+                <div class="slide-indicator"></div>
+                <div class="slide-indicator"></div>
+		<div class="slide-indicator"></div>
+		<div class="slide-indicator"></div>
+            </div>
+          
+        </header>
+
+        <section style="padding: 3rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center;">
+            <h1 style="font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 3rem; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                <span style="display: block; color: white;">EXPERIENCE THE</span>
+                <span style="display: block; color: var(--primary);" class="text-glow-pink">GENERATIVE FUTURE</span>
+                <span style="display: block; color: white;">OF MUSIC TELEVISION</span>
+            </h1>
+
+<div style="margin-bottom: 3rem;">
+    <a href="channel.html" class="breathe-button" style="display: inline-block !important; padding: 1rem 1.5rem !important; background-color: #ff0055 !important; text-decoration: none !important; border-radius: 2px !important; border: none !important; box-shadow: none !important; transition: all 0.3s ease !important;">
+        <span style="color: #ffffff !important; font-family: 'Montserrat', sans-serif !important; font-weight: 700 !important; font-size: 0.8rem !important; letter-spacing: 0.3em !important; position: relative; z-index: 10; display: block !important;">P L A Y  ▶</span>
+    </a>
+</div>
+
+        </section>
+
+        <section style="padding: 2rem; max-width: 1400px; margin: 0 auto;">
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; margin-bottom: 5rem; gap: 2rem;">
+               
+ <div>
+                    <span style="color: var(--secondary); font-family: 'Syncopate', sans-serif; font-size: 0.625rem; letter-spacing: 0.4em; text-transform: uppercase; display: block; margin-bottom: 0.75rem;">PLATFORM CORE</span>
+                    <h2 style="font-size: clamp(3rem, 5vw, 4.5rem); font-family: 'Syncopate', sans-serif; font-weight: 700; line-height: 0.9;">NETWORK <br/>FEATURES</h2>
+                </div>
+                <p style="color: #94a3b8; max-width: 320px; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; line-height: 1.75; text-align: right;">
+                    A curated ecosystem designed for the next era of visual consumption and neural artistry.
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <span class="material-symbols-outlined">live_tv</span>
+                    </div>
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">24/7 STREAM</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.75; font-weight: 300;">
+                        Infinite loop of high-definition AI music videos. Curated 24 hours a day, 7 days a week for non-stop visual immersion.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <span class="material-symbols-outlined">person_search</span>
+                    </div>
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">ARTIST SHOWCASE</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.75; font-weight: 300;">
+                        Discover the pioneers of generative visuals. Profiles, collections, and exclusive drops from top neural artists.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <span class="material-symbols-outlined">bookmark_add</span>
+                    </div>
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">FAVORITES SYSTEM</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.75; font-weight: 300;">
+                        Curate your own visual library. Save the most impressive prompts and music videos to your personal collection.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <span class="material-symbols-outlined">playlist_play</span>
+                    </div>
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">FAVORITES PLAYBACK</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.75; font-weight: 300;">
+                        Personalized TV mode. Play only the videos you love in a seamless, high-performance visual stream.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <span class="material-symbols-outlined">monitoring</span>
+                    </div>
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">REAL-TIME STATS</h3>
+                    <div style="margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.625rem; letter-spacing: 0.1em; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">
+                            <span>Users Connected</span>
+                            <span style="color: var(--primary);" id="user-count">4,281</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.625rem; letter-spacing: 0.1em; color: #64748b; font-weight: 700; text-transform: uppercase;">
+                            <span>Signals Injected</span>
+                            <span style="color: var(--primary);" id="signal-count">1.2M</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon-box">
+                        <span class="material-symbols-outlined">stars</span>
+                    </div>
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">GAMIFICATION</h3>
+                    <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.75; font-weight: 300;">
+                        Level up by interacting. Earn unique badges and rewards based on your watching habits and community participation.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section style="padding: 6rem 2rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+            <h2 style="font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; margin-bottom: 2rem;">
+                READY TO <span style="color: var(--primary);">EXPLORE</span> THE FUTURE?
+            </h2>
+            <p style="color: #94a3b8; max-width: 700px; margin: 0 auto 2.5rem;">
+                Join our community of creators and generative visual enthusiasts. Be part of the next revolution in audiovisual content.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                <button onclick="window.location.href='channel.html'" style="padding: 0.75rem 2rem; background: var(--primary); color: white; border: none; font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 0.625rem; letter-spacing: 0.3em; cursor: pointer; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    SIGN UP FREE
+                </button>
+                <button style="padding: 0.75rem 2rem; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 0.625rem; letter-spacing: 0.3em; cursor: pointer; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                    LEARN MORE
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer style="border-top: 1px solid rgba(255,255,255,0.05); padding: 5rem 2rem;">
+<div style="max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 4rem;">
+            <div>
+                <span style="font-family: 'Lato', sans-serif; font-weight: 700; font-size: 1.25rem; display: block; margin-bottom: 1.5rem;">
+                    <span style="color: var(--primary);" class="text-glow-pink">GMV |</span>
+                    <span style="color: white;"> GENERATIVE MUSIC VIDEO</span>
+                </span>
+                <p style="color: #64748b; font-size: 0.875rem; font-weight: 500;">
+                    The world's first decentralized generative music video network. Powered by AI, directed by you.
+                </p>
+            </div>
+            
+            <div>
+                <span style="color: var(--primary); font-family: 'Syncopate', sans-serif; font-size: 0.625rem; letter-spacing: 0.3em; font-weight: 700; display: block; margin-bottom: 1rem;">NETWORK</span>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <a href="channel.html" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Live Stream</a>
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Archive</a>
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Schedule</a>
+                </div>
+            </div>
+            
+            <div>
+                <span style="color: var(--secondary); font-family: 'Syncopate', sans-serif; font-size: 0.625rem; letter-spacing: 0.3em; font-weight: 700; display: block; margin-bottom: 1rem;">LEGAL</span>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Privacy</a>
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Terms</a>
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Copyright</a>      
+                </div>
+            </div>
+
+            <div>
+                <span style="color: white; font-family: 'Syncopate', sans-serif; font-size: 0.625rem; letter-spacing: 0.3em; font-weight: 700; display: block; margin-bottom: 1rem;">SOCIAL</span>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <a href="https://www.youtube.com/@GenerativeMusicVideo" target="_blank" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">YouTube</a>
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Discord</a>
+                    <a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">X / Twitter</a>
+                </div>
+            </div>
+
+            <div>
+                <span style="color: white; font-family: 'Syncopate', sans-serif; font-size: 0.625rem; letter-spacing: 0.3em; font-weight: 700; display: block; margin-bottom: 1rem;">SUPPORT</span>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <a href="https://ko-fi.com/generativemusicvideo/tip" target="_blank" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Ko-Fi</a>
+                    <a href="mailto:generativemusicvideo@gmail.com" style="color: #94a3b8; text-decoration: none; font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase; font-family: 'Syncopate', sans-serif; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Contact</a>
+                </div>
+            </div>
+        </div> 
+<div style="max-width: 1600px; margin: -2.5rem auto 0; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; font-size: 0.625rem; letter-spacing: 0.2em; color: #475569; font-weight: 700; text-transform: uppercase; font-family: 'Syncopate', sans-serif;">
+    <p style="margin: 0;">© 2026 GMV PLATFORM. ALL RIGHTS RESERVED.</p>
+    <p style="margin: 0;">POWERED BY YOUTUBE</p>
+</div>
+    </footer>
+
 
     <script>
-        // --- GLOBAL SETUP ---
-        let userName = ""; let ctx, mic, micGain, analyser; let isRunning = false; let currentMode = 'origen';
-        let intervals = []; let clockInterval = null; let animationFrameId;
-        
-        let lastClockTick = 0; let handAngles = { s: 0, m: 0, h: 0 };
-        let tiltX = 0; 
-
-        const canvas = document.getElementById('bg-canvas'); const cCtx = canvas.getContext('2d');
-        let canvasW, canvasH, minDimension;
-        
-        let fallingMen = []; let olaRipples = []; let activeTexts = []; 
-        
-        const quotes = [{ q: "“La realidad es aquello que, cuando dejas de creer en ello, no desaparece.”", a: "— Philip K. Dick" }, { q: "“Todo lo que vemos o parecemos es solamente un sueño dentro de un sueño.”", a: "— Edgar Allan Poe" }, { q: "“Quien mira hacia afuera, sueña; quien mira hacia adentro, despierta.”", a: "— Carl Jung" }, { q: "“¿Qué es la vida? Un frenesí. ¿Qué es la vida? Una ilusión.”", a: "— Calderón de la Barca" }, { q: "“Pienso, luego existo.”", a: "— René Descartes" }];
-        let locuraTexts = ["CUIDADO", "TE ESCUCHAN", "TE VIGILAN", "NO ES REAL", "DESPIERTA", "ELLOS SABEN", "ERROR", "HUYE", "NO MIRES ATRÁS", "SISTEMA CAÍDO", "MENTIRA", "FALSO", "IRREAL", "BUCLE", "ERROR CRÍTICO", "VOCES", "NO CONFÍES", "OBSERVADOS", "EL FIN", "SILENCIO", "¿QUIÉN ERES?", "DESCONECTA", "CONTROL", "CAOS", "FANTASMA", "NADIE"];
-        
-        let chaosLevel = 0; let voicePhase = 0; let olaPhase = 0; let timePhase = 0;
-        let userDist, userDelay, userPanner, userLFO, userFilter, userConvolver;
-        let availableVoices = [];
-        let phrases = ["Despierta", "No es real", "Te observan", "Silencio", "Corre", "Sistema", "¿Me oyes?", "Atrás", "Falso"];
-
-        if(window.speechSynthesis) window.speechSynthesis.onvoiceschanged = () => { availableVoices = window.speechSynthesis.getVoices(); };
-
-        window.onload = function() {
-            const rand = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('login-quote').innerText = rand.q; document.getElementById('login-author').innerText = rand.a;
-            resizeCanvas();
-            window.addEventListener('deviceorientation', (e) => { tiltX = e.gamma || 0; });
-        };
-
-        function resizeCanvas() {
-            canvasW = window.innerWidth; canvasH = window.innerHeight; minDimension = Math.min(canvasW, canvasH);
-            canvas.width = canvasW; canvas.height = canvasH;
-            initVisuals();
+	// Esto obliga a la página a subir al inicio siempre que se recargue
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
         }
-        window.addEventListener('resize', resizeCanvas);
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slider-image');
+        const overlays = document.querySelectorAll('.slide-overlay');
+        const indicators = document.querySelectorAll('.slide-indicator');
+        const slideTexts = document.querySelectorAll('.slide-text');
+        const progressBar = document.getElementById('slide-progress');
+        let slideInterval;
         
-        function initVisuals() {
-            fallingMen = []; olaRipples = []; activeTexts = [];
-            for(let i=0; i<35; i++) { fallingMen.push({ x: Math.random()*canvasW, y: Math.random()*canvasH, speed: 1+Math.random()*2, scale: 0.3+Math.random()*0.5, angle: Math.random()*Math.PI*2, rotSpeed: (Math.random()-0.5)*0.03 }); }
-        }
-
-        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e=>{}); else if (document.exitFullscreen) document.exitFullscreen().catch(e=>{}); }
-        
-        async function enterApp() {
-            const input = document.getElementById('username'); if(input.value.trim() === "") { alert("Identidad requerida"); return; }
-            userName = input.value.trim(); 
-            phrases.push("Despierta " + userName); phrases.push(userName + " no es real"); locuraTexts.push(userName);
-            
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try { await DeviceOrientationEvent.requestPermission(); } catch (e) { console.log(e); }
+        function resetProgress() {
+            if (progressBar) {
+                progressBar.classList.remove('active');
+                void progressBar.offsetWidth;
+                progressBar.classList.add('active');
             }
-
-            playLoginMelody();
-            const login = document.getElementById('login-screen'); 
-            login.style.opacity = 0; 
-            login.style.pointerEvents = 'none'; 
-            setTimeout(() => { 
-                login.style.display = 'none'; 
-            }, 1000);
-        }
-
-        function playLoginMelody() {
-            const tempCtx = new (window.AudioContext || window.webkitAudioContext)(); const now = tempCtx.currentTime;
-            [440, 523.25, 659.25, 880, 659.25, 523.25].forEach((f, i) => playTone(f, 0.4, 'sine', tempCtx, now + i*0.2));
-            playTone(440, 1.5, 'triangle', tempCtx, now + 1.2); 
-        }
-        function togglePlayStop() { if(isRunning) stopSystem(); else prepareStart(); }
-
-        function switchMode(m) {
-            currentMode = m; document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            if(document.getElementById(`btn-${m}`)) document.getElementById(`btn-${m}`).classList.add('active');
-            document.body.className = `mode-${m}`;
-            cCtx.clearRect(0, 0, canvasW, canvasH); document.body.style.backgroundColor = '#000'; 
-            document.querySelectorAll('.ring').forEach(r => r.style.borderRadius = '50%');
-            if(isRunning) { stopSystem(); setTimeout(prepareStart, 100); }
-        }
-
-        async function prepareStart() {
-            ctx = new (window.AudioContext || window.webkitAudioContext)();
-            document.getElementById('status-text').innerText = "INICIANDO...";
-            startSystem();
-        }
-
-        async function startSystem() {
-            try {
-                if(ctx.state === 'suspended') await ctx.resume();
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mic = ctx.createMediaStreamSource(stream); micGain = ctx.createGain(); mic.connect(micGain);
-                analyser = ctx.createAnalyser(); analyser.fftSize = 256; micGain.connect(analyser);
-                if(currentMode === 'locura') startLocura(); else if(currentMode === 'ola') startOla(); else if(currentMode === 'reloj') startReloj(); else if(currentMode === 'origen') startOrigen();
-                isRunning = true; visualize(); document.body.classList.add('running'); document.getElementById('status-text').innerText = "• PROTOCOLO ACTIVO •";
-            } catch(e) { console.error(e); alert("Error micrófono: " + e.message); }
-        }
-
-        function stopSystem() {
-            if(ctx) ctx.close(); intervals.forEach(clearInterval); if(clockInterval) clearInterval(clockInterval); if(animationFrameId) cancelAnimationFrame(animationFrameId);
-            intervals = []; isRunning = false; cCtx.clearRect(0,0,canvasW,canvasH); 
-            document.body.classList.remove('running'); document.getElementById('status-text').innerText = "PAUSA";
-            document.getElementById('eye-core').style.width = "40px"; document.getElementById('eye-core').style.height = "40px";
-            document.querySelectorAll('.ring').forEach(r => {r.style.transform = "translate(-50%,-50%) scale(1)"; r.style.borderRadius = '50%'; }); 
-            document.body.style.backgroundColor = '#000';
-        }
-
-        // --- AUDIO ENGINES ---
-        function startOrigen() { 
-            const convo = createConvolver(3); const delay = createDelay(0.4, 0.4); micGain.connect(convo); micGain.connect(delay); delay.connect(convo); convo.connect(ctx.destination); delay.connect(ctx.destination); 
-            
-            // ZUMBIDO DE ORIGEN RESTAURADO (V21)
-            const o1=ctx.createOscillator(); o1.frequency.value=55; o1.type='sawtooth'; const o2=ctx.createOscillator(); o2.frequency.value=56; o2.type='sawtooth'; const f=ctx.createBiquadFilter(); f.frequency.value=400; const g=ctx.createGain(); g.gain.value=0.15; o1.connect(f); o2.connect(f); f.connect(g); g.connect(ctx.destination); o1.start(); o2.start(); 
-        }
-
-        function startOla() { olaPhase = 0; userFilter = ctx.createBiquadFilter(); userDelay = createDelay(0.4, 0.5); userPanner = ctx.createStereoPanner(); micGain.connect(userFilter); userFilter.connect(userDelay); userDelay.connect(userPanner); userPanner.connect(ctx.destination); intervals.push(setInterval(() => { olaPhase = (olaPhase + 1) % 4; updateOlaVoice(); }, 12000)); const bSize=ctx.sampleRate*2; const b=ctx.createBuffer(1,bSize,ctx.sampleRate); const d=b.getChannelData(0); for(let i=0;i<bSize;i++) d[i]=(Math.random()*2-1)*0.05; const noise=ctx.createBufferSource(); noise.buffer=b; noise.loop=true; const nf=ctx.createBiquadFilter(); nf.type='lowpass'; nf.frequency.value=400; noise.connect(nf); nf.connect(ctx.destination); noise.start(); const lfo=ctx.createOscillator(); lfo.frequency.value=0.15; const lg=ctx.createGain(); lg.gain.value=300; lfo.connect(lg); lg.connect(nf.frequency); lfo.start(); intervals.push(setInterval(() => { if(Math.random() > 0.7) playBird(); }, 4000)); }
-        function playBird() { const osc = ctx.createOscillator(); const g = ctx.createGain(); const pan = ctx.createStereoPanner(); osc.type = 'sine'; osc.frequency.setValueAtTime(1500 + Math.random()*1000, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3); g.gain.setValueAtTime(0, ctx.currentTime); g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); pan.pan.value = Math.random()*2 - 1; osc.connect(g); g.connect(pan); pan.connect(userDelay); osc.start(); osc.stop(ctx.currentTime + 0.5); }
-        function updateOlaVoice() { 
-            const t = ctx.currentTime; let panVal = Math.max(-1, Math.min(1, tiltX / 30)); userPanner.pan.rampToValueAtTime(panVal, t + 0.1);
-            if(olaPhase===0){ userFilter.type='lowpass'; userFilter.frequency.linearRampToValueAtTime(300,t+1); userDelay.delayTime.linearRampToValueAtTime(0.4,t+1); } else if(olaPhase===1){ userFilter.type='highpass'; userFilter.frequency.linearRampToValueAtTime(1500,t+1); userDelay.delayTime.linearRampToValueAtTime(0.1,t+1); } else if(olaPhase===2){ userFilter.type='allpass'; userDelay.delayTime.linearRampToValueAtTime(0.05,t+1); } else { userFilter.type='lowpass'; userFilter.frequency.value=800; userDelay.delayTime.linearRampToValueAtTime(0.8,t+1); } 
         }
         
-        function startReloj() { 
-            timePhase=0; userDist=ctx.createWaveShaper(); userDist.curve=makeDistortion(0); userFilter=ctx.createBiquadFilter(); userDelay=createDelay(0,0); userPanner=ctx.createStereoPanner(); userConvolver=createConvolver(3); 
-            
-            micGain.connect(userFilter); userFilter.connect(userDist); userDist.connect(userDelay); userDelay.connect(userPanner); userPanner.connect(userConvolver); userConvolver.connect(ctx.destination); userPanner.connect(ctx.destination); 
-            
-            intervals.push(setInterval(() => { timePhase=(timePhase+1)%4; updateTimeVoice(); }, 10000)); 
-            
-            let tick=true; 
-            clockInterval = setInterval(() => { 
-                if(!isRunning) return; 
-                lastClockTick = Date.now(); 
-                const osc=ctx.createOscillator(); const g=ctx.createGain(); 
+let typingInterval;
+
+function typeWriter(element, text, i = 0) {
+    if (i < text.length) {
+        element.textContent += text.charAt(i);
+        // Velocidad de escritura: 40ms por letra para que sea fluido
+        typingInterval = setTimeout(() => typeWriter(element, text, i + 1), 40); 
+    }
+}
+
+function showSlide(index) {
+    const slides = document.querySelectorAll('.slider-image');
+    const overlays = document.querySelectorAll('.slide-overlay');
+    const slideTexts = document.querySelectorAll('.slide-text');
+    const indicators = document.querySelectorAll('.slide-indicator');
+
+    // 1. Frenamos cualquier escritura que esté pasando
+    clearTimeout(typingInterval);
+
+    // 2. Apagamos todo lo anterior
+    slides.forEach(el => el.classList.remove('active'));
+    overlays.forEach(el => el.classList.remove('active'));
+    slideTexts.forEach(el => el.classList.remove('active'));
+    indicators.forEach(el => el.classList.remove('active'));
+    
+    // 3. Limpiamos el texto escrito en todos los slides
+    document.querySelectorAll('.typing-target').forEach(el => el.textContent = '');
+
+    // 4. Encendemos el slide actual
+    if (slides[index]) slides[index].classList.add('active');
+    if (overlays[index]) overlays[index].classList.add('active');
+    if (slideTexts[index]) {
+        slideTexts[index].classList.add('active');
+        
+        // 5. Buscamos el texto que guardamos en 'data-text' y empezamos a escribirlo
+        const target = slideTexts[index].querySelector('.typing-target');
+        const fullText = target.getAttribute('data-text');
+        typeWriter(target, fullText);
+    }
+    if (indicators[index]) indicators[index].classList.add('active');
+
+    currentSlide = index;
+    resetProgress();
+}
+        
+        function nextSlide() {
+            const index = (currentSlide + 1) % slides.length;
+            showSlide(index);
+        }
+        
+        function startSlideshow() {
+	    if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 8000);
+            resetProgress();
+        }
+        
+        function stopSlideshow() {
+            clearInterval(slideInterval);
+            if (progressBar) progressBar.classList.remove('active');
+        }
+        
+	// Añade esto al final de tus scripts
+document.addEventListener('DOMContentLoaded', () => {
+setTimeout(() => {
+        showSlide(0);
+    }, 100); 
+});
+        startSlideshow();
+        
+// Re-seleccionamos para que siempre sepa cuántos hay
+        document.querySelectorAll('.slide-indicator').forEach((indicator, index) => {
+            indicator.onclick = () => {
+                stopSlideshow();
+                showSlide(index);
+                startSlideshow();
+            };
+        });
                 
-                // CONEXION DEL TIC-TOC AL DESTINO DE AUDIO (Tal como estaba en V21)
-                osc.connect(g); g.connect(ctx.destination); 
-
-                osc.frequency.setValueAtTime(tick?800:600, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime+0.05); 
-                g.gain.setValueAtTime(0, ctx.currentTime); g.gain.linearRampToValueAtTime(0.7, ctx.currentTime+0.005); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.1); 
-                osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.1); 
-                if(Math.random()>0.85) playChime(); tick=!tick; 
-            }, 1000); 
-        }
-        function playChime(){ const osc=ctx.createOscillator(); const g=ctx.createGain(); const pan=ctx.createStereoPanner(); pan.pan.value=Math.random()*2-1; osc.connect(g); g.connect(pan); pan.connect(ctx.destination); osc.frequency.value=[523.25,659.25,783.99][Math.floor(Math.random()*3)]; g.gain.setValueAtTime(0,ctx.currentTime); g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+0.1); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+4); osc.start(); osc.stop(ctx.currentTime+4); }
-        function updateTimeVoice() { if(timePhase===0) userDelay.delayTime.value=0.4; else if(timePhase===1) userDelay.delayTime.value=0.01; else if(timePhase===2) userDelay.delayTime.value=0.6; else { userDelay.delayTime.value=0.1; userDist.curve=makeDistortion(400); userFilter.type='lowpass'; userFilter.frequency.value=600; } }
-        function startLocura() { 
-            chaosLevel=0; voicePhase=0; userDist=ctx.createWaveShaper(); userDist.curve=makeDistortion(0); userDelay=createDelay(0.4,0.5); userPanner=ctx.createStereoPanner(); userFilter=ctx.createBiquadFilter(); userLFO=ctx.createGain(); micGain.connect(userDist); userDist.connect(userFilter); userFilter.connect(userLFO); userLFO.connect(userDelay); userDelay.connect(userPanner); userPanner.connect(ctx.destination); micGain.connect(ctx.destination); intervals.push(setInterval(() => { voicePhase=(voicePhase+1)%6; updateVoiceEffect(); }, 8000)); const osc=ctx.createOscillator(); osc.type='triangle'; const g=ctx.createGain(); g.gain.value=0; const f=ctx.createBiquadFilter(); osc.connect(f); f.connect(g); g.connect(ctx.destination); osc.start(); intervals.push(setInterval(() => { let note = [100,120,140,200,300][Math.floor(Math.random()*5)]; if(Math.random()>0.8) note+=Math.random()*50; osc.frequency.setValueAtTime(note,ctx.currentTime); g.gain.cancelScheduledValues(ctx.currentTime); g.gain.setValueAtTime(0,ctx.currentTime); g.gain.linearRampToValueAtTime(0.2+(chaosLevel/400),ctx.currentTime+0.1); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4); }, 400)); intervals.push(setInterval(()=>{ chaosLevel=Math.min(100,chaosLevel+5); }, 4000)); 
-            intervals.push(setInterval(()=>{ if(Math.random()<0.6) speak(phrases[Math.floor(Math.random()*phrases.length)], 0.5+Math.random()*1.5, 0.6+Math.random()*0.8, true); }, 1500)); 
-        }
-        function updateVoiceEffect(){ const t=ctx.currentTime; userDist.curve=makeDistortion(0); userPanner.pan.setValueAtTime(0,t); userFilter.type='allpass'; if(voicePhase===1) { userDelay.delayTime.value=0.03; userDist.curve=makeDistortion(100); } if(voicePhase===2) { userDelay.delayTime.value=0.6; userDist.curve=makeDistortion(400); } if(voicePhase===3) { userPanner.pan.setValueAtTime(-1,t); userPanner.pan.linearRampToValueAtTime(1,t+2); } if(voicePhase===5) { userFilter.type='bandpass'; userFilter.frequency.value=1000; userDist.curve=makeDistortion(200); } }
-        function speak(t,p,r,v){ const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.pitch=p; u.rate=r; if(v&&availableVoices.length>0)u.voice=availableVoices[Math.floor(Math.random()*availableVoices.length)]; speechSynthesis.speak(u); }
-        function playTone(f,d,type,c,t){ const o=c.createOscillator(); const g=c.createGain(); o.type=type; o.frequency.value=f; o.connect(g); g.connect(c.destination); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.2,t+0.05); g.gain.exponentialRampToValueAtTime(0.001,t+d); o.start(t); o.stop(t+d); }
-        function createDelay(t,f){ const d=ctx.createDelay(); d.delayTime.value=t; const g=ctx.createGain(); g.gain.value=f; d.connect(g); g.connect(d); return d; }
-        function createConvolver(t){ const l=ctx.sampleRate*t,b=ctx.createBuffer(2,l,ctx.sampleRate); for(let i=0;i<l;i++){ let k=(1-i/l); b.getChannelData(0)[i]=(Math.random()*2-1)*k; b.getChannelData(1)[i]=(Math.random()*2-1)*k; } const c=ctx.createConvolver(); c.buffer=b; return c; }
-        function makeDistortion(k){ if(k===0)return null; const n=44100,c=new Float32Array(n); for(let i=0;i<n;i++){let x=i*2/n-1;c[i]=(3+k)*x*20*(Math.PI/180)/(Math.PI+k*Math.abs(x));}return c; }
-
-        // --- VISUALIZADOR ---
-        function visualize() {
-            if(!isRunning) return;
-            const a = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(a);
-            let s=0; for(let i of a) s+=i; const avg = s/a.length;
+        function updateStats() {
+            const userCount = document.getElementById('user-count');
+            const signalCount = document.getElementById('signal-count');
             
-            let bassSum = 0; for(let i=0; i<20; i++) bassSum += a[i]; const bassAvg = bassSum / 20;
-
-            const baseSize = 40; const growthFactor = avg * 6; let newSize = baseSize + growthFactor;
-            const maxSize = minDimension * 0.9; if(newSize > maxSize) newSize = maxSize;
-            const core = document.getElementById('eye-core');
-            core.style.width = `${newSize}px`; core.style.height = `${newSize}px`;
-
-            const threshold = maxSize * 0.85; let borderAlpha = 1;
-            if(newSize > threshold) { borderAlpha = Math.max(0.1, (maxSize - newSize) / (maxSize - threshold)); }
-
-            const intensity = Math.floor(avg * 2);
-            const rect = core.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2; const centerY = rect.top + rect.height / 2;
-            const time = Date.now()/1000;
+            const currentUsers = parseInt(userCount.textContent.replace(',', ''));
+            const newUsers = currentUsers + Math.floor(Math.random() * 10) - 3;
+            userCount.textContent = newUsers.toLocaleString();
             
-            cCtx.clearRect(0,0,canvasW,canvasH); 
-
-            if (currentMode === 'origen') {
-                document.body.style.backgroundColor = `rgb(${intensity}, ${intensity}, ${intensity})`;
-                core.style.borderColor = `rgba(255,255,255,${borderAlpha})`; 
-                document.querySelectorAll('.ring').forEach(r => r.style.transform = `translate(-50%, -50%) scale(${1 + Math.sin(time)*0.05})`);
-
-            } else if (currentMode === 'ola') {
-                let olaInt = intensity > 50 ? (intensity - 50) : 0;
-                document.body.style.backgroundColor = `rgb(0, ${Math.floor(olaInt/4)}, ${olaInt/2})`;
-                core.style.borderColor = `rgba(0,255,255,${borderAlpha})`;
-                document.querySelectorAll('.ring').forEach((r, i) => { const r1 = 50 + Math.sin(time*2 + i)*15; const r2 = 50 + Math.cos(time*3 + i)*15; r.style.borderRadius = `${r1}% ${100-r1}% ${r2}% ${100-r2}% / ${r2}% ${r1}% ${100-r2}% ${100-r1}%`; const rot = tiltX * 2; r.style.transform = `translate(-50%, -50%) rotate(${rot}deg) scale(${1 + Math.sin(time)*0.1 + avg/150})`; });
-                if(avg > 15 && Math.random() > 0.8) { const types = [{c:'#00ffff', w:1}, {c:'#00ffff', w:3}, {c:'#ffffff', w:2}, {c:'#000000', w:4}]; const type = types[Math.floor(Math.random()*types.length)]; olaRipples.push({r: rect.width/2, alpha: 1, speed: 2 + avg/40, ...type}); }
-                for(let i = olaRipples.length - 1; i >= 0; i--) { let rip = olaRipples[i]; cCtx.beginPath(); cCtx.globalAlpha = rip.alpha; cCtx.lineWidth = rip.w; cCtx.strokeStyle = rip.c; cCtx.arc(centerX, centerY, rip.r, 0, Math.PI*2); cCtx.stroke(); rip.r += rip.speed; rip.alpha -= (0.015 / rip.w); if(rip.alpha <= 0) olaRipples.splice(i, 1); } cCtx.globalAlpha = 1.0;
-
-            } else if (currentMode === 'reloj') {
-                document.body.style.backgroundColor = `rgb(${intensity}, ${Math.floor(intensity*0.8)}, 0)`;
-                core.style.borderColor = `rgba(230,194,0,${borderAlpha})`;
-                const timeSinceTick = Date.now() - lastClockTick; let clockPulse = 0; if(timeSinceTick < 600) { clockPulse = 1 - (timeSinceTick / 600); }
-                document.querySelectorAll('.ring').forEach((r, i) => { r.style.transform = `translate(-50%, -50%) scale(${1 + (clockPulse * 0.8) + (i*0.2)})`; });
-                cCtx.fillStyle = '#000'; cCtx.strokeStyle = '#000'; cCtx.lineWidth = 1.5;
-                fallingMen.forEach(m => { m.y += m.speed + (avg/30); m.angle += m.rotSpeed; if(m.y > canvasH + 50) m.y = -50; cCtx.save(); cCtx.translate(m.x, m.y); cCtx.rotate(m.angle); cCtx.scale(m.scale, m.scale); cCtx.beginPath(); cCtx.arc(0, -20, 7, 0, Math.PI*2); cCtx.moveTo(-5, -15); cCtx.quadraticCurveTo(0, 0, -5, 15); cCtx.lineTo(5, 15); cCtx.quadraticCurveTo(10, 0, 5, -15); cCtx.closePath(); cCtx.moveTo(-5, -10); cCtx.lineTo(-25, -20); cCtx.lineTo(-30, -15); cCtx.lineTo(-8, -5); cCtx.moveTo(5, -10); cCtx.lineTo(25, -20); cCtx.lineTo(30, -15); cCtx.lineTo(8, -5); cCtx.moveTo(-5, 15); cCtx.lineTo(-20, 35); cCtx.lineTo(-15, 40); cCtx.lineTo(0, 18); cCtx.moveTo(5, 15); cCtx.lineTo(20, 35); cCtx.lineTo(15, 40); cCtx.lineTo(0, 18); cCtx.fill(); cCtx.restore(); });
-                cCtx.beginPath(); cCtx.arc(centerX, centerY, newSize/2, 0, Math.PI*2); cCtx.fillStyle = '#000'; cCtx.fill();
-                handAngles.s += 0.02 + (avg * 0.01); handAngles.m += 0.005 + (avg * 0.002); handAngles.h += 0.001 + (avg * 0.0005);
-                cCtx.lineCap = 'round'; cCtx.shadowBlur = 5; cCtx.shadowColor = '#000'; const yellowTransparent = 'rgba(255, 234, 0, 0.4)'; 
-                function drawHand(angle, len, width, arrow) { cCtx.strokeStyle = yellowTransparent; cCtx.fillStyle = yellowTransparent; cCtx.lineWidth = width; const tipX = centerX + Math.cos(angle - Math.PI/2) * len; const tipY = centerY + Math.sin(angle - Math.PI/2) * len; cCtx.beginPath(); cCtx.moveTo(centerX, centerY); cCtx.lineTo(tipX, tipY); cCtx.stroke(); if(arrow) { cCtx.beginPath(); const hLen = 15; const backX = centerX + Math.cos(angle - Math.PI/2) * (len - hLen); const backY = centerY + Math.sin(angle - Math.PI/2) * (len - hLen); const w = width * 3; cCtx.moveTo(tipX, tipY); cCtx.lineTo(backX + Math.cos(angle)*w, backY + Math.sin(angle)*w); cCtx.lineTo(backX, backY); cCtx.lineTo(backX - Math.cos(angle)*w, backY - Math.sin(angle)*w); cCtx.fill(); } }
-                drawHand(handAngles.s, 160, 1, true); drawHand(handAngles.m, 130, 3, true); drawHand(handAngles.h, 90, 4, true); cCtx.shadowBlur = 0;
-
-            } else if (currentMode === 'locura') {
-                let redBase = Math.min(100, chaosLevel*1.5);
-                document.body.style.backgroundColor = `rgb(${redBase + intensity}, 0, 0)`;
-                core.style.borderColor = `rgba(255,0,0,${borderAlpha})`;
-                if(Math.random() < 0.15 + (avg/500)) { activeTexts.push({ text: locuraTexts[Math.floor(Math.random()*locuraTexts.length)], x: Math.random() * canvasW, y: Math.random() * canvasH, life: 1.0, color: Math.random()>0.5?'#fff':'#000', size: 20 + Math.random()*60 }); }
-                for(let i = activeTexts.length - 1; i >= 0; i--) { let t = activeTexts[i]; cCtx.globalAlpha = t.life; cCtx.fillStyle = t.color; cCtx.font = `bold ${t.size}px 'Courier New'`; cCtx.textAlign = 'center'; cCtx.fillText(t.text, t.x, t.y); t.life -= 0.02; if(t.life <= 0) activeTexts.splice(i, 1); } cCtx.globalAlpha = 1.0;
-                document.querySelectorAll('.ring').forEach(r => { r.style.transform = `translate(-50%, -50%) scale(${1 + Math.sin(Date.now()/200)*0.2})`; r.style.borderStyle = "dashed"; });
-            }
-            animationFrameId = requestAnimationFrame(visualize);
+            const currentSignals = parseFloat(signalCount.textContent.replace('M', ''));
+            const newSignals = (currentSignals + Math.random() * 0.01).toFixed(2);
+            signalCount.textContent = newSignals + 'M';
         }
-    </script></body></html>
+        
+        setInterval(updateStats, 5000);
+    </script>
+</body>
+</html>
