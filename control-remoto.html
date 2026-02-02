@@ -636,6 +636,30 @@
 .vote-btn.down.voted svg { 
     fill: #ff0055 !important; /* El icono se pone rosa */
 }
+/* Estilo para los corazones del pulso concéntrico */
+.heart-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 2rem;
+    pointer-events: none; /* Evita que el corazón bloquee clics en el botón */
+    z-index: 10;
+    animation: heartExpand 1.5s ease-out forwards;
+}
+
+/* Definición de la animación de expansión */
+@keyframes heartExpand {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.5); 
+        opacity: 0.8; 
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(4); 
+        opacity: 0; 
+    }
+}
+
     </style>
 </head>
 <body>
@@ -835,13 +859,20 @@ const socket = io('https://gmv-server.onrender.com');
         if (navigator.vibrate) navigator.vibrate(35);
     }
 
-    function toggleFavLocal() {
-        const favBtn = document.querySelector('.func-btn.fav');
-        if (!favBtn) return;
-        favBtn.classList.toggle('is-favorite');
-        if (navigator.vibrate) navigator.vibrate(50);
-        send('favorite');
+function toggleFavLocal() {
+    const favBtn = document.querySelector('.func-btn.fav');
+    if (!favBtn) return;
+    
+    favBtn.classList.toggle('is-favorite');
+    
+    // Si se activa el favorito, disparamos los corazones
+    if (favBtn.classList.contains('is-favorite')) {
+        createHeartBurst(favBtn);
     }
+    
+    if (navigator.vibrate) navigator.vibrate(50);
+    send('favorite');
+}
 
     function openKeyboard() {
         document.getElementById('keyboardOverlay').classList.add('show');
@@ -1082,6 +1113,20 @@ recognition.onerror = (event) => {
                 pagination.appendChild(dot);
             }
         }
+function createHeartBurst(btn) {
+    const colors = ['#ff0055', '#ff3377', '#ff6699', '#ff0000'];
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('span');
+            heart.className = 'heart-pulse';
+            heart.innerHTML = '❤️';
+            heart.style.color = colors[i % colors.length];
+            btn.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1500);
+        }, i * 250);
+    }
+}
     </script>
 </body>
 </html>
