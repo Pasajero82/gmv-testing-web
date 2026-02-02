@@ -904,9 +904,9 @@ let recognition;
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
+    recognition.lang = 'es-MX';
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
 } else {
     alert("Tu navegador no soporta reconocimiento de voz");
 }
@@ -949,17 +949,25 @@ async function startVoiceControl() {
 }
 
 recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    const command = transcript.toLowerCase().trim();
-    
-    if (command.includes("next")) {
-        send('next');
-    }
-    else if (command.includes("previous") || command.includes("back")) {
-        send('prev');
-    }
-    else if (command.includes("pause") || command.includes("stop")) {
-        send('pause');
+    for (let i = 0; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        const command = transcript.toLowerCase().trim();
+        
+        const marquee = document.getElementById('current-track-name');
+        marquee.innerText = ">> " + transcript.toUpperCase();
+        
+        if (command.includes("siguiente") || command.includes("next") || command.includes("sig")) {
+            send('next');
+            marquee.innerText = "✓ NEXT";
+        }
+        else if (command.includes("anterior") || command.includes("previous") || command.includes("back") || command.includes("atrás")) {
+            send('prev');
+            marquee.innerText = "✓ PREV";
+        }
+        else if (command.includes("pausa") || command.includes("pause") || command.includes("stop") || command.includes("pausar")) {
+            send('pause');
+            marquee.innerText = "✓ PAUSE";
+        }
     }
 };
 
