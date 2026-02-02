@@ -1006,6 +1006,13 @@ recognition.onnomatch = () => {
 recognition.onsoundstart = () => {
     alert("DETECTÉ SONIDO!");
 };
+recognition.onaudiostart = () => {
+    alert("AUDIO INICIADO - HABLA MUY FUERTE AHORA!");
+};
+
+recognition.onaudioend = () => {
+    alert("AUDIO TERMINADO");
+};
     recognition.onend = () => {
         document.getElementById('voice-trigger-btn').classList.remove('active');
         cancelAnimationFrame(animationId);
