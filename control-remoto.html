@@ -953,11 +953,22 @@ recognition.onresult = (event) => {
     
     marquee.innerText = ">> " + transcript.toUpperCase();
 
-    // 1. TOP 10 (COMANDO DEL BOTÓN *)
-    if (command.includes("top 10") || command.includes("top diez") || command.includes("ranking")) {
-        send('top-10'); 
-        marquee.innerText = "✓ TOP 10 GLOBAL";
-    }
+// A. RANKING (Incluye "top diez" y "top 10")
+else if (command.includes("ranking") || command.includes("top diez") || command.includes("top 10") || command.includes("tabla")) { 
+    send('top-10'); 
+    marquee.innerText = "✓ RANKING ON PC"; 
+}
+
+// B. UI (Ocultar/Mostrar controles)
+else if (command.includes("minimizar") || command.includes("ocultar") || command.includes("mostrar") || command.includes("ver controles")) { 
+    send('minimize'); 
+    marquee.innerText = "✓ UI TOGGLED"; 
+}
+// C. COMPARTIR
+else if (command.includes("compartir") || command.includes("redes") || command.includes("enviar")) { 
+    send('share'); 
+    marquee.innerText = "✓ SHARE MENU ON PC"; 
+}
 
     // 2. REPRODUCIR FAVORITOS (PLAY ALL)
     else if (command.includes("reproducir favoritos") || command.includes("pon mis favoritos")) {
@@ -986,10 +997,10 @@ recognition.onresult = (event) => {
     }
 
     // 5. SILENCIO (MUTE)
-    else if (command.includes("silencio") || command.includes("mutear") || command.includes("mute") || command.includes("callar")) {
-        send('mute');
-        marquee.innerText = "✓ MUTE";
-    }
+else if (command.includes("silencio") || command.includes("mute") || command.includes("callar")) {
+    send('mute');
+    marquee.innerText = "✓ MUTE TOGGLED";
+}
 
     // 6. NAVEGACIÓN Y OTROS
     else if (command.includes("siguiente") || command.includes("next")) { send('next'); }
