@@ -955,8 +955,8 @@ recognition.onresult = (event) => {
     
     marquee.innerText = ">> " + transcript.toUpperCase();
 
-    // 1. VOTOS (NEGATIVOS PRIMERO PARA QUE NO SE CONFUNDA CON "ME GUSTA")
-    if (command.includes("no me gusta") || command.includes("dislike") || command.includes("odio") || command.includes("mierda")) {
+    // 1. VOTOS (NEGATIVOS PRIMERO) - QUITAMOS "MIERDA"
+    if (command.includes("no me gusta") || command.includes("dislike") || command.includes("odio")) {
         processVote('down');
         marquee.innerText = "✓ DISLIKE";
     }
@@ -965,47 +965,46 @@ recognition.onresult = (event) => {
         marquee.innerText = "✓ LIKE";
     }
 
-    // 2. SILENCIO TOTAL
+    // 2. SILENCIO (MUTE) - ESTO ENVÍA EL COMANDO, PERO FALTA EL RECEPTOR EN PC
     else if (command.includes("silencio") || command.includes("mutear") || command.includes("mute") || command.includes("callar")) {
         send('mute');
-        marquee.innerText = "✓ MUTE";
+        marquee.innerText = "✓ MUTE SENT";
     }
 
-    // 3. FAVORITOS (SEPARADOS: LISTA VS AÑADIR)
-    else if (command.includes("lista") || command.includes("ver favoritos") || command.includes("mostrar favoritos")) {
-        send('fav-menu'); // Abre el menú en la PC
-        marquee.innerText = "✓ FAV LIST";
+    // 3. LISTAS Y TOP (AÑADIDO TOP 10)
+    else if (command.includes("top 10") || command.includes("lista") || command.includes("ver favoritos")) {
+        send('fav-menu'); // Abre el ranking/lista en la PC
+        marquee.innerText = "✓ TOP LIST";
     }
     else if (command.includes("favorito") || command.includes("añadir")) {
-        toggleFavLocal(); // Añade la canción actual
+        toggleFavLocal();
         marquee.innerText = "✓ FAV UPDATED";
     }
 
     // 4. INTERFAZ (MOSTRAR Y OCULTAR)
     else if (command.includes("mostrar") || command.includes("enseñar") || command.includes("ver")) {
-        send('minimize'); // Toggle para mostrar
+        send('minimize'); 
         marquee.innerText = "✓ SHOWING";
     }
     else if (command.includes("ocultar") || command.includes("minimizar") || command.includes("hide")) {
-        send('minimize'); // Toggle para ocultar
+        send('minimize');
         marquee.innerText = "✓ HIDING";
     }
 
-    // 5. MURO (PC) Y TECLADO (MANDO)
+    // 5. MURO Y TECLADO
     else if (command.includes("muro") || command.includes("wall")) {
-        send('marquee'); // Muestra el feed en la PC
+        send('marquee'); 
         marquee.innerText = "✓ WALL VIEW";
     }
     else if (command.includes("escribir") || command.includes("mensaje")) {
-        openKeyboard(); // Abre el teclado en el celular
+        openKeyboard(); 
         marquee.innerText = "✓ KEYBOARD";
     }
 
-    // 6. PESTAÑAS Y BÓVEDA
+    // 6. DATOS Y BÓVEDA
     else if (command.includes("recompensa") || command.includes("bóveda") || command.includes("vault")) {
         send('rewards');
         switchTab('vault');
-        marquee.innerText = "✓ VAULT";
     }
     else if (command.includes("estadística") || command.includes("stats")) {
         send('stats');
@@ -1016,7 +1015,7 @@ recognition.onresult = (event) => {
         switchTab('achievements');
     }
 
-    // 7. NAVEGACIÓN Y SALIR
+    // 7. NAVEGACIÓN BÁSICA
     else if (command.includes("siguiente") || command.includes("next")) {
         send('next');
     }
@@ -1027,7 +1026,7 @@ recognition.onresult = (event) => {
         send('esc');
     }
 
-    // 8. BÚSQUEDA (SI NO ES NADA DE LO ANTERIOR)
+    // 8. BÚSQUEDA POR VOZ (SI NO ES NADA DE LO ANTERIOR)
     else {
         marquee.innerText = "🔍 " + transcript.toUpperCase();
         socket.emit('enviar-comando', { cmd: 'voice-search', query: command, room: roomID });
