@@ -899,15 +899,17 @@ const socket = io('https://gmv-server.onrender.com');
     });
 
     // --- SISTEMA DE VOZ CORREGIDO ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-	recognition.continuous = false;
-	recognition.interimResults = false;
-        recognition.maxAlternatives = 5;
-    }
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+} else {
+    alert("Tu navegador no soporta reconocimiento de voz");
+}
 
     let audioContext, analyser, dataArray, animationId;
 
@@ -997,7 +999,12 @@ recognition.onspeechend = () => {
 };
 
 recognition.onnomatch = () => {
-    alert("NO ENTENDÍ LO QUE DIJISTE");
+    alert("NO MATCH");
+    recognition.stop();
+};
+
+recognition.onsoundstart = () => {
+    alert("DETECTÉ SONIDO!");
 };
     recognition.onend = () => {
         document.getElementById('voice-trigger-btn').classList.remove('active');
