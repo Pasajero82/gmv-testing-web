@@ -904,6 +904,7 @@ const socket = io('https://gmv-server.onrender.com');
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
+	recognition.lang = 'es-MX'; 
         recognition.continuous = false;
 	recognition.interimResults = true;
     }
@@ -951,16 +952,40 @@ const socket = io('https://gmv-server.onrender.com');
     }
 
 recognition.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
+    const command = event.results[0][0].transcript.toLowerCase().trim();
+    const marquee = document.getElementById('current-track-name');
+    marquee.innerText = ">> " + command.toUpperCase();
+    
+    console.log("Comando detectado:", command);
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                finalTranscript += event.results[i][0].transcript;
-            } else {
-                interimTranscript += event.results[i][0].transcript;
-            }
-        }
+    // Comandos específicos
+    if (command.includes("next") || command.includes("siguiente")) {
+        send('next');
+        marquee.innerText = "NEXT TRACK >";
+    }
+    else if (command.includes("previous") || command.includes("anterior") || command.includes("back")) {
+        send('prev');
+        marquee.innerText = "< PREVIOUS TRACK";
+    }
+    else if (command.includes("pause") || command.includes("stop") || command.includes("pausar")) {
+        send('pause');
+        marquee.innerText = "|| PAUSED";
+    }
+    else if (command.includes("stats") || command.includes("estadísticas")) {
+        switchTab('stats');
+        marquee.innerText = "STATS MODE";
+    }
+    else if (command.includes("awards") || command.includes("achievement") || command.includes("logros")) {
+        switchTab('achievements');
+        marquee.innerText = "AWARDS MODE";
+    }
+    else {
+        marquee.innerText = "COMMAND NOT RECOGNIZED";
+    }
+    
+    // Vibración de feedback
+    if (navigator.vibrate) navigator.vibrate(50);
+};
 
         // 1. Mostrar en tiempo real lo que vas diciendo (en gris para que sepa que está procesando)
         const marquee = document.getElementById('current-track-name');
