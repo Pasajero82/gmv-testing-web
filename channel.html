@@ -4274,6 +4274,28 @@ socket.on('ejecutar-comando', (data) => {
             });
             break;
 
+	case 'voice-search':
+            if (data.query) {
+                const busqueda = data.query.toLowerCase().trim();
+                
+                // Buscamos en musicVideos (que ya tiene tus datos de Google Sheets)
+                const coincidencias = musicVideos.filter(v => 
+                    v.artist.toLowerCase().includes(busqueda) || 
+                    v.title.toLowerCase().includes(busqueda)
+                );
+
+                if (coincidencias.length > 0) {
+                    // Si hay varias canciones, elige una al azar
+                    const elegido = coincidencias[Math.floor(Math.random() * coincidencias.length)];
+                    
+                    showSystemMessage("🔍 ENCONTRADO: " + elegido.artist.toUpperCase());
+                    playSpecificVideo(elegido, true); 
+                } else {
+                    showSystemMessage("🚫 NO ENCONTRADO: " + data.query.toUpperCase());
+                }
+            }
+            break;
+
 		case 'vote':
             	if (data.voteType) {
                 triggerVoteAnimation(data.voteType); // Sigue haciendo la animación
