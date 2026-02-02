@@ -820,319 +820,176 @@
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script>
-        const socket = io('https://gmv-server.onrender.com');
-        const urlParams = new URLSearchParams(window.location.search);
-        let roomID = urlParams.get('room');
-	let hasVotedCurrent = false; // Bloqueo de votos por video
+const socket = io('https://gmv-server.onrender.com');
+    const urlParams = new URLSearchParams(window.location.search);
+    let roomID = urlParams.get('room');
+    let hasVotedCurrent = false;
 
-        // Unión a sala
-        if (!roomID) {
-            console.error("⚠️ No Room ID!");
-            document.getElementById('status').innerText = 'ERROR: NO ROOM';
-        } else {
-            socket.emit('join-room', roomID);
+    if (!roomID) {
+        document.getElementById('status').innerText = 'ERROR: NO ROOM';
+    } else {
+        socket.emit('join-room', roomID);
+    }
+
+    function send(cmd) {
+        if (!roomID) return;
+        socket.emit('enviar-comando', { cmd, room: roomID, time: Date.now() });
+        if (navigator.vibrate) navigator.vibrate(35);
+    }
+
+    function toggleFavLocal() {
+        const favBtn = document.querySelector('.func-btn.fav');
+        if (!favBtn) return;
+        favBtn.classList.toggle('is-favorite');
+        if (navigator.vibrate) navigator.vibrate(50);
+        send('favorite');
+    }
+
+    function openKeyboard() {
+        document.getElementById('keyboardOverlay').classList.add('show');
+        setTimeout(() => document.getElementById('muroInput').focus(), 100);
+    }
+
+    function closeKeyboard() {
+        document.getElementById('keyboardOverlay').classList.remove('show');
+        document.getElementById('muroInput').value = '';
+    }
+
+    function sendToWall() {
+        const texto = document.getElementById('muroInput').value.trim();
+        if (texto && roomID) {
+            socket.emit('enviar-comando', { cmd: 'muro-broadcast', texto: texto.toUpperCase(), room: roomID });
+            closeKeyboard();
         }
+    }
 
-        // Función para enviar comandos
-        function send(cmd) {
-            if (!roomID) return;
-            console.log("📤 Enviando:", cmd);
-            socket.emit('enviar-comando', { cmd, room: roomID, time: Date.now() });
-            if (navigator.vibrate) navigator.vibrate(35);
-        }
-
-	function toggleFavLocal() {
-            const favBtn = document.querySelector('.func-btn.fav');
-            if (!favBtn) return;
-
-            // 1. Reacción visual instantánea (Toggle de clase)
-            favBtn.classList.toggle('is-favorite');
-
-            // 2. Vibración específica para esta acción (un poco más larga)
-            if (navigator.vibrate) navigator.vibrate(50);
-
-            // 3. Enviar el comando real a la PC
-            send('favorite');
-        }
-        function openKeyboard() {
-            document.getElementById('keyboardOverlay').classList.add('show');
-            setTimeout(() => document.getElementById('muroInput').focus(), 100);
-        }
-
-        function closeKeyboard() {
-            document.getElementById('keyboardOverlay').classList.remove('show');
-            document.getElementById('muroInput').value = '';
-        }
-
-        function sendToWall() {
-            const texto = document.getElementById('muroInput').value.trim();
-            if (texto && roomID) {
-                socket.emit('enviar-comando', { 
-                    cmd: 'muro-broadcast', 
-                    texto: texto.toUpperCase(), 
-                    room: roomID 
-                });
-                closeKeyboard();
-                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-            }
-        }
-
-        document.getElementById('muroInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendToWall();
-        });
-
-        // Eventos de conexión
-	socket.on('connect', () => {
-        console.log("✅ Socket Conectado");
-        // Agregamos la clase al contenedor principal para activar los colores
+    socket.on('connect', () => {
         document.querySelector('.top-status-bar').classList.add('online-mode');
         document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
-        
-        setTimeout(() => {
-            if(roomID) send('sync');
-        }, 600);
+        if(roomID) send('sync');
     });
 
-        socket.on('disconnect', () => {
-            document.getElementById('status').className = 'status';
-            document.getElementById('status').innerText = 'OFFLINE';
-        });
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase() === tab.toLowerCase());
+        if (activeTab) activeTab.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            
-            const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase() === tab.toLowerCase());
-            if (activeTab) activeTab.classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-        }
-
-        // RECEPTOR DE LA CANCIÓN
-        socket.on('ejecutar-comando', (data) => {
-	// --- RECEPTOR DE USUARIO, STATS Y LOGROS (CORREGIDO) ---
-if (data.cmd === 'update-user-data') {
-            // Actualizamos los textos básicos
+    socket.on('ejecutar-comando', (data) => {
+        if (data.cmd === 'update-user-data') {
             document.getElementById('remote-username').innerText = data.username;
             document.getElementById('remote-level').innerText = "[" + data.level + "]";
             document.getElementById('remote-videos').innerText = data.totalVideos;
             document.getElementById('remote-time').innerText = data.watchTime;
             document.getElementById('remote-streak').innerText = data.streak + " days";
             document.getElementById('remote-level-stats').innerText = data.level;
-		// CONTROL DEL BOTÓN FAVORITO
             const favBtn = document.querySelector('.func-btn.fav');
-            if (favBtn) {
-                if (data.isFavorite) {
-                    favBtn.classList.add('is-favorite');
-                } else {
-                    favBtn.classList.remove('is-favorite');
-                }
-            }
-            // Si vienen logros, los dibujamos con el sistema de páginas
-            if (data.achievements) {
-                renderAchievementsRemote(data.achievements);
-            }
-            return;
+            if (favBtn) data.isFavorite ? favBtn.classList.add('is-favorite') : favBtn.classList.remove('is-favorite');
         }
-
-        // ------------------------------------
-	if (data.cmd === 'update-track') {
-    hasVotedCurrent = false;
-    const bUp = document.getElementById('btn-vote-up');
-    const bDown = document.getElementById('btn-vote-down');
-    
-    // Limpiamos bloqueo y colores previos
-    if(bUp) bUp.classList.remove('disabled', 'voted');
-    if(bDown) bDown.classList.remove('disabled', 'voted');
-
-    const trackDisplay = document.getElementById('current-track-name');
-    if (trackDisplay && data.title && data.artist) {
-        trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
-    }
-}
-        });
-	let currentAchPageRemote = 0;
-
-        function renderAchievementsRemote(achList) {
-            const container = document.getElementById('ach-pages-container-remote');
-            const pagination = document.getElementById('ach-pagination-remote');
-            const ACH_PER_PAGE = 4;
-            const totalPages = Math.ceil(achList.length / ACH_PER_PAGE);
-
-            container.innerHTML = '';
-            pagination.innerHTML = '';
-
-            for (let i = 0; i < totalPages; i++) {
-                const page = document.createElement('div');
-                page.className = 'ach-page-remote' + (i === currentAchPageRemote ? ' active' : '');
-                
-                const start = i * ACH_PER_PAGE;
-                const pageAchs = achList.slice(start, start + ACH_PER_PAGE);
-
-                pageAchs.forEach(ach => {
-                    const item = document.createElement('div');
-                    item.className = 'stat-item';
-                    item.innerHTML = `
-                        <span class="stat-label">${ach.icon} ${ach.name}</span>
-                        <span class="stat-value">${ach.unlocked ? '✓' : '🔒'}</span>
-                    `;
-                    page.appendChild(item);
-                });
-                container.appendChild(page);
-
-                // Crear el punto de navegación
-                const dot = document.createElement('div');
-                dot.className = 'remote-dot' + (i === currentAchPageRemote ? ' active' : '');
-                dot.onclick = () => {
-                    currentAchPageRemote = i;
-                    renderAchievementsRemote(achList);
-                };
-                pagination.appendChild(dot);
-            }
+        if (data.cmd === 'update-track') {
+            hasVotedCurrent = false;
+            document.getElementById('btn-vote-up').classList.remove('disabled', 'voted');
+            document.getElementById('btn-vote-down').classList.remove('disabled', 'voted');
+            const trackDisplay = document.getElementById('current-track-name');
+            if (trackDisplay && data.title) trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
         }
-
-	function processVote(type) {
-    if (hasVotedCurrent) return;
-
-    // 1. Bloqueo de seguridad
-    hasVotedCurrent = true;
-    const btnUp = document.getElementById('btn-vote-up');
-    const btnDown = document.getElementById('btn-vote-down');
-
-    // 2. Pintar el botón que tocaste y bloquear ambos
-    if (type === 'up') {
-        btnUp.classList.add('voted');
-    } else {
-        btnDown.classList.add('voted');
-    }
-
-    btnUp.classList.add('disabled');
-    btnDown.classList.add('disabled');
-
-    // 3. Vibración y envío a PC
-    if (navigator.vibrate) {
-        type === 'up' ? navigator.vibrate([40, 30, 40]) : navigator.vibrate(100);
-    }
-
-    socket.emit('enviar-comando', { 
-        cmd: 'vote', 
-        voteType: type, 
-        room: roomID 
     });
-}	
-// 1. Preparamos el "oído" del navegador
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition;
 
-if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'en-US'; // Escuchará en inglés como tu app
-    recognition.continuous = false; // Se detiene cuando dejas de hablar
-    recognition.interimResults = false; // Solo nos da el resultado final
-} else {
-    alert("Voice control is not supported in this browser.");
-}
-
-//2 VARIABLES PARA EL SONIDO (Nuevas)
-let audioContext;
-let analyser;
-let dataArray;
-let animationId;
-
-// AYUDANTE DE COLORES (Nuevo)
-function visualize() {
-    if (!analyser) return;
-    analyser.getByteFrequencyData(dataArray);
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
+    // --- SISTEMA DE VOZ CORREGIDO ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
     }
-    let average = sum / dataArray.length;
-    // Esto mueve los colores según tu voz
-    // Buscamos el cuadro gris (el mando)
-    const remoteDiv = document.querySelector('.remote');
-    if (remoteDiv) {
-        // En lugar de cambiar el fondo, le damos un brillo interno que se mueva con tu voz
-        remoteDiv.style.backgroundColor = `hsl(${280 + average}, 30%, ${10 + average / 5}%)`;
-        remoteDiv.style.boxShadow = `0 20px 60px rgba(0,0,0,0.6), 0 0 ${average/2}px hsl(${280 + average}, 70%, 50%)`;
-    }
-    animationId = requestAnimationFrame(visualize);
-}
 
-// TU NUEVA FUNCIÓN PASO 2 (Sustituye a la anterior)
-async function startVoiceControl() {
-    if (!recognition) return;
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioContext.createMediaStreamSource(stream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
+    let audioContext, analyser, dataArray, animationId;
 
-        const btn = document.getElementById('voice-trigger-btn');
-        if (btn) btn.classList.add('active');
+    function visualize() {
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        let average = sum / dataArray.length;
 
-        recognition.start(); 
-        visualize(); // <-- Aquí arrancan los colores
-    } catch (err) {
-        console.error("Error con el micro:", err);
+        const remoteDiv = document.querySelector('.remote');
+        if (remoteDiv) {
+            // USAMOS .style.background PARA SOBRESCRIBIR EL GRADIENTE
+            remoteDiv.style.background = `hsl(${280 + average}, 40%, ${15 + average / 4}%)`;
+            remoteDiv.style.boxShadow = `0 0 ${average}px hsl(${280 + average}, 100%, 50%), 0 20px 60px rgba(0,0,0,0.8)`;
+        }
+        animationId = requestAnimationFrame(visualize);
     }
-}
-// 3. Qué pasa cuando el navegador termina de procesar tu voz
-recognition.onresult = (event) => {
-    // Convertimos lo que dijiste a letras y lo ponemos en minúsculas
-    const command = event.results[0][0].transcript.toLowerCase();
-    console.log("Command received:", command);
-    // Esto escribirá en tu marquesina azul lo que el micro entendió
-    document.getElementById('current-track-name').innerText = "HEARD: " + command.toUpperCase();
 
-    // Lógica de comandos: Si dices la palabra, se ejecuta la función
-    if (command.includes("stats")) {
-        send('stats');
-        switchTab('stats');
-    } 
-    else if (command.includes("awards") || command.includes("achievements")) {
-        send('achievements');
-        switchTab('achievements');
-    } 
-    else if (command.includes("next")) {
-        send('next');
-    } 
-    else if (command.includes("previous") || command.includes("back")) {
-        send('prev');
-    } 
-    else if (command.includes("pause") || command.includes("stop")) {
-        send('pause');
-    } 
-    else if (command.includes("esc") || command.includes("escape")) {
-        send('esc');
-    }
-    else {
-        // Aquí es donde en el futuro buscaremos canciones por nombre
-        console.log("Not a command, future search for:", command);
-    }
-};
+    async function startVoiceControl() {
+        if (!recognition) return;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaStreamSource(stream);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 64;
+            source.connect(analyser);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-// TU NUEVO PASO 4 (Sustituye al anterior)
-recognition.onend = () => {
-    const btn = document.getElementById('voice-trigger-btn');
-    if (btn) btn.classList.remove('active');
-    
-    // Apagamos la animación y el micro para no gastar batería
-    cancelAnimationFrame(animationId);
-    if (audioContext) audioContext.close();
-    
-    // Fondo negro de vuelta
-    const remoteDiv = document.querySelector('.remote');
-    if (remoteDiv) {
-        // Regresa a tu gradiente y sombra original
-        remoteDiv.style.background = "linear-gradient(145deg, #1a1a1a, #0f0f0f)";
-        remoteDiv.style.boxShadow = "0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)";
+            document.getElementById('voice-trigger-btn').classList.add('active');
+            
+            // Pausamos la animación de la marquesina para que el texto sea legible
+            const marquee = document.getElementById('current-track-name');
+            marquee.style.animation = 'none';
+            marquee.style.paddingLeft = '0';
+            marquee.innerText = "LISTENING...";
+
+            recognition.start();
+            visualize();
+        } catch (err) { console.error(err); }
     }
-    console.log("Visualizer OFF");
-};
+
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase().trim();
+        document.getElementById('current-track-name').innerText = ">> " + command.toUpperCase();
+
+        if (command.includes("stats")) { send('stats'); switchTab('stats'); }
+        else if (command.includes("awards") || command.includes("achievement")) { send('achievements'); switchTab('achievements'); }
+        else if (command.includes("next")) { send('next'); }
+        else if (command.includes("previous") || command.includes("back")) { send('prev'); }
+        else if (command.includes("pause") || command.includes("stop")) { send('pause'); }
+        else if (command.includes("esc")) { send('esc'); }
+    };
+
+    recognition.onend = () => {
+        document.getElementById('voice-trigger-btn').classList.remove('active');
+        cancelAnimationFrame(animationId);
+        if (audioContext) audioContext.close();
+
+        // Restauramos el cuadro gris a su estado original
+        const remoteDiv = document.querySelector('.remote');
+        if (remoteDiv) {
+            remoteDiv.style.background = "linear-gradient(145deg, #1a1a1a, #0f0f0f)";
+            remoteDiv.style.boxShadow = "0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)";
+        }
+
+        // Restauramos la animación de la marquesina después de 2 segundos
+        setTimeout(() => {
+            const marquee = document.getElementById('current-track-name');
+            marquee.style.animation = 'marquee-led 10s linear infinite';
+            marquee.style.paddingLeft = '100%';
+        }, 2000);
+    };
+
+    function processVote(type) {
+        if (hasVotedCurrent) return;
+        hasVotedCurrent = true;
+        const btnUp = document.getElementById('btn-vote-up');
+        const btnDown = document.getElementById('btn-vote-down');
+        type === 'up' ? btnUp.classList.add('voted') : btnDown.classList.add('voted');
+        btnUp.classList.add('disabled');
+        btnDown.classList.add('disabled');
+        socket.emit('enviar-comando', { cmd: 'vote', voteType: type, room: roomID });
+    }
     </script>
 </body>
 </html>
