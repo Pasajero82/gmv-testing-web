@@ -22,6 +22,7 @@
             align-items: center;
             padding: 20px;
             color: #fff;
+	    transition: background 0.3s ease;
         }
 
         /* STATUS BADGE */
@@ -243,6 +244,51 @@
             border-color: #ff0055;
             box-shadow: 0 0 15px rgba(255,0,85,0.4);
         }
+	
+/* Botón de voz miniatura para ir junto al ESC */
+.voice-btn {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 30px;  /* Muy pequeño y discreto */
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.voice-btn svg {
+    width: 14px; /* Icono pequeño */
+    fill: rgba(255, 255, 255, 0.4);
+}
+
+.voice-btn.active {
+    background: #ff0055;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+    border-color: #fff;
+}
+
+.voice-btn.active svg {
+    fill: #fff;
+}
+
+/* Cuando lo tocas, se pone de un color azul neón */
+.voice-btn.active {
+    background: #00ccff;
+    box-shadow: 0 0 30px rgba(0, 204, 255, 0.8);
+    border-color: #fff;
+}
+
+	.voice-btn svg {
+    	width: 30px;
+    	fill: rgba(255, 255, 255, 0.5);
+	}
+
+	.voice-btn.active svg {
+	fill: #000;
+	}
 
         .func-btn.fav.is-favorite svg,
         .func-btn.fav.is-favorite .label {
@@ -490,7 +536,7 @@
     color: white;
     box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
 }
-	/* --- ACHIEVEMENT PAGES & DOTS --- */
+	/* --- ACHIEVEMENT PAGES & DOTS (TRASPLANTADO) --- */
         .ach-page-remote {
             display: none !important; /* Esconde todas las páginas por defecto */
             width: 100%;
@@ -613,7 +659,7 @@
             <button class="vote-btn down" id="btn-vote-down" onclick="processVote('down')">
                 <svg viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.37-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
             </button>
-        </div>
+       </div>
     <div class="dpad-container">
         <div class="dpad-bg"></div>
         
@@ -637,10 +683,15 @@
             <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
     </div>
-<div class="esc-row">
-            <button class="esc-pill" onclick="send('esc')">ESC</button>
+<div class="esc-row" style="position: relative;">
+    <button class="esc-pill" onclick="send('esc')">ESC</button>
+<div class="voice-btn" id="voice-trigger-btn" onclick="startVoiceControl()" style="display: inline-flex; vertical-align: middle; margin-left: 10px;">
+    <svg viewBox="0 0 24 24">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+    </svg>
+</div>
         </div>
-        <!-- FUNCTION GRID (CON ESC INTEGRADO) -->
         <div class="func-grid">
             <button class="func-btn" onclick="send('minimize')">
                 <span class="key-num">1</span>
@@ -699,7 +750,6 @@
         </div>
     </div>
 
-    <!-- INFO PANEL -->
     <div class="info-panel">
         <div class="info-header">
             <div class="tab active" onclick="switchTab('stats')">STATS</div>
@@ -755,7 +805,6 @@
         </div>
     </div>
 
-    <!-- KEYBOARD OVERLAY -->
     <div class="keyboard-overlay" id="keyboardOverlay">
         <div class="keyboard-box">
             <div class="keyboard-title">INJECT SIGNAL TO WALL</div>
@@ -768,137 +817,232 @@
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script>
-        const socket = io('https://gmv-server.onrender.com');
-        const urlParams = new URLSearchParams(window.location.search);
-        let roomID = urlParams.get('room');
-	let hasVotedCurrent = false; // Bloqueo de votos por video
+<script>
+const socket = io('https://gmv-server.onrender.com');
+    const urlParams = new URLSearchParams(window.location.search);
+    let roomID = urlParams.get('room');
+    let hasVotedCurrent = false;
 
-        // Unión a sala
-        if (!roomID) {
-            console.error("⚠️ No Room ID!");
-            document.getElementById('status').innerText = 'ERROR: NO ROOM';
-        } else {
-            socket.emit('join-room', roomID);
+    if (!roomID) {
+        document.getElementById('status').innerText = 'ERROR: NO ROOM';
+    } else {
+        socket.emit('join-room', roomID);
+    }
+
+    function send(cmd) {
+        if (!roomID) return;
+        socket.emit('enviar-comando', { cmd, room: roomID, time: Date.now() });
+        if (navigator.vibrate) navigator.vibrate(35);
+    }
+
+    function toggleFavLocal() {
+        const favBtn = document.querySelector('.func-btn.fav');
+        if (!favBtn) return;
+        favBtn.classList.toggle('is-favorite');
+        if (navigator.vibrate) navigator.vibrate(50);
+        send('favorite');
+    }
+
+    function openKeyboard() {
+        document.getElementById('keyboardOverlay').classList.add('show');
+        setTimeout(() => document.getElementById('muroInput').focus(), 100);
+    }
+
+    function closeKeyboard() {
+        document.getElementById('keyboardOverlay').classList.remove('show');
+        document.getElementById('muroInput').value = '';
+    }
+
+    function sendToWall() {
+        const texto = document.getElementById('muroInput').value.trim();
+        if (texto && roomID) {
+            socket.emit('enviar-comando', { cmd: 'muro-broadcast', texto: texto.toUpperCase(), room: roomID });
+            closeKeyboard();
         }
+    }
 
-        // Función para enviar comandos
-        function send(cmd) {
-            if (!roomID) return;
-            console.log("📤 Enviando:", cmd);
-            socket.emit('enviar-comando', { cmd, room: roomID, time: Date.now() });
-            if (navigator.vibrate) navigator.vibrate(35);
-        }
-
-	function toggleFavLocal() {
-            const favBtn = document.querySelector('.func-btn.fav');
-            if (!favBtn) return;
-
-            // 1. Reacción visual instantánea (Toggle de clase)
-            favBtn.classList.toggle('is-favorite');
-
-            // 2. Vibración específica para esta acción (un poco más larga)
-            if (navigator.vibrate) navigator.vibrate(50);
-
-            // 3. Enviar el comando real a la PC
-            send('favorite');
-        }
-        function openKeyboard() {
-            document.getElementById('keyboardOverlay').classList.add('show');
-            setTimeout(() => document.getElementById('muroInput').focus(), 100);
-        }
-
-        function closeKeyboard() {
-            document.getElementById('keyboardOverlay').classList.remove('show');
-            document.getElementById('muroInput').value = '';
-        }
-
-        function sendToWall() {
-            const texto = document.getElementById('muroInput').value.trim();
-            if (texto && roomID) {
-                socket.emit('enviar-comando', { 
-                    cmd: 'muro-broadcast', 
-                    texto: texto.toUpperCase(), 
-                    room: roomID 
-                });
-                closeKeyboard();
-                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-            }
-        }
-
-        document.getElementById('muroInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendToWall();
-        });
-
-        // Eventos de conexión
-	socket.on('connect', () => {
-        console.log("✅ Socket Conectado");
-        // Agregamos la clase al contenedor principal para activar los colores
+    socket.on('connect', () => {
         document.querySelector('.top-status-bar').classList.add('online-mode');
         document.getElementById('status').innerText = 'ONLINE : ' + (roomID || 'SEARCHING...');
-        
-        setTimeout(() => {
-            if(roomID) send('sync');
-        }, 600);
+        if(roomID) send('sync');
     });
 
-        socket.on('disconnect', () => {
-            document.getElementById('status').className = 'status';
-            document.getElementById('status').innerText = 'OFFLINE';
-        });
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase() === tab.toLowerCase());
+        if (activeTab) activeTab.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            
-            const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase() === tab.toLowerCase());
-            if (activeTab) activeTab.classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-        }
-
-        // RECEPTOR DE LA CANCIÓN
-        socket.on('ejecutar-comando', (data) => {
-	// --- RECEPTOR DE USUARIO, STATS Y LOGROS (CORREGIDO) ---
-if (data.cmd === 'update-user-data') {
-            // Actualizamos los textos básicos
+    socket.on('ejecutar-comando', (data) => {
+        if (data.cmd === 'update-user-data') {
             document.getElementById('remote-username').innerText = data.username;
             document.getElementById('remote-level').innerText = "[" + data.level + "]";
             document.getElementById('remote-videos').innerText = data.totalVideos;
             document.getElementById('remote-time').innerText = data.watchTime;
             document.getElementById('remote-streak').innerText = data.streak + " days";
             document.getElementById('remote-level-stats').innerText = data.level;
-		// CONTROL DEL BOTÓN FAVORITO
+	    if (data.achievements) renderAchievementsRemote(data.achievements);
             const favBtn = document.querySelector('.func-btn.fav');
-            if (favBtn) {
-                if (data.isFavorite) {
-                    favBtn.classList.add('is-favorite');
-                } else {
-                    favBtn.classList.remove('is-favorite');
-                }
-            }
-            // Si vienen logros, los dibujamos con el sistema de páginas
-            if (data.achievements) {
-                renderAchievementsRemote(data.achievements);
-            }
-            return;
+            if (favBtn) data.isFavorite ? favBtn.classList.add('is-favorite') : favBtn.classList.remove('is-favorite');
+        }
+        if (data.cmd === 'update-track') {
+            hasVotedCurrent = false;
+            document.getElementById('btn-vote-up').classList.remove('disabled', 'voted');
+            document.getElementById('btn-vote-down').classList.remove('disabled', 'voted');
+            const trackDisplay = document.getElementById('current-track-name');
+            if (trackDisplay && data.title) trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
+        }
+    });
+
+    // --- SISTEMA DE VOZ CORREGIDO ---
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = navigator.language || 'es-MX';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+} else {
+    alert("Tu navegador no soporta reconocimiento de voz");
+}
+
+    let audioContext, analyser, dataArray, animationId;
+
+    function visualize() {
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        let average = sum / dataArray.length;
+
+        const remoteDiv = document.querySelector('.remote');
+        if (remoteDiv) {
+            remoteDiv.style.background = `hsl(${280 + average}, 40%, ${15 + average / 4}%)`;
+            remoteDiv.style.boxShadow = `0 0 ${average}px hsl(${280 + average}, 100%, 50%), 0 20px 60px rgba(0,0,0,0.8)`;
+        }
+        animationId = requestAnimationFrame(visualize);
+    }
+
+async function startVoiceControl() {
+    if (!recognition) {
+        alert('Tu navegador no soporta reconocimiento de voz');
+        return;
+    }
+    
+    document.getElementById('voice-trigger-btn').classList.add('active');
+
+const marquee = document.getElementById('current-track-name');
+marquee.style.animation = 'none';
+marquee.style.paddingLeft = '0';
+marquee.innerText = "LISTENING...";
+
+try {
+    recognition.start();
+} catch(e) {
+    alert("Error: " + e.message);
+}
+}
+
+recognition.onresult = (event) => {
+    const transcript = event.results[event.results.length - 1][0].transcript;
+    const command = transcript.toLowerCase().trim();
+    const marquee = document.getElementById('current-track-name');
+    
+    marquee.innerText = ">> " + transcript.toUpperCase();
+
+    // 1. TOP 10 (COMANDO DEL BOTÓN *)
+    if (command.includes("top 10") || command.includes("top diez") || command.includes("ranking")) {
+        send('top-10'); 
+        marquee.innerText = "✓ TOP 10 GLOBAL";
+    }
+
+    // 2. REPRODUCIR FAVORITOS (PLAY ALL)
+    else if (command.includes("reproducir favoritos") || command.includes("pon mis favoritos")) {
+        send('play-favs'); 
+        marquee.innerText = "✓ PLAYING FAVS";
+    }
+
+    // 3. VOTOS (NEGATIVOS PRIMERO)
+    else if (command.includes("no me gusta") || command.includes("dislike") || command.includes("odio")) {
+        processVote('down');
+        marquee.innerText = "✓ DISLIKE";
+    }
+    else if (command.includes("me gusta") || command.includes("like") || command.includes("encanta") || command.includes("amo")) {
+        processVote('up');
+        marquee.innerText = "✓ LIKE";
+    }
+
+    // 4. FAVORITOS (MENÚ VISUAL)
+    else if (command.includes("lista") || command.includes("ver favoritos") || command.includes("mostrar favoritos")) {
+        send('fav-menu'); 
+        marquee.innerText = "✓ FAV LIST";
+    }
+    else if (command.includes("favorito") || command.includes("añadir")) {
+        toggleFavLocal();
+        marquee.innerText = "✓ FAV UPDATED";
+    }
+
+    // 5. SILENCIO (MUTE)
+    else if (command.includes("silencio") || command.includes("mutear") || command.includes("mute") || command.includes("callar")) {
+        send('mute');
+        marquee.innerText = "✓ MUTE";
+    }
+
+    // 6. NAVEGACIÓN Y OTROS
+    else if (command.includes("siguiente") || command.includes("next")) { send('next'); }
+    else if (command.includes("anterior") || command.includes("atrás")) { send('prev'); }
+    else if (command.includes("pausa") || command.includes("play") || command.includes("pause")) { send('pause'); }
+    else if (command.includes("recompensa") || command.includes("bóveda") || command.includes("vault")) { send('rewards'); switchTab('vault'); }
+    else if (command.includes("estadística") || command.includes("stats")) { send('stats'); switchTab('stats'); }
+    else if (command.includes("muro") || command.includes("wall")) { send('marquee'); }
+    else if (command.includes("escribir") || command.includes("mensaje")) { openKeyboard(); }
+    else if (command.includes("escape") || command.includes("salir") || command.includes("cerrar")) { send('esc'); }
+
+    // 7. BÚSQUEDA POR VOZ (SI NO ES NADA DE LO ANTERIOR)
+    else {
+        marquee.innerText = "🔍 " + transcript.toUpperCase();
+        socket.emit('enviar-comando', { cmd: 'voice-search', query: command, room: roomID });
+    }
+};
+
+recognition.onerror = (event) => {
+    const marquee = document.getElementById('current-track-name');
+    marquee.innerText = "ERROR: " + event.error.toUpperCase();
+};
+
+    recognition.onend = () => {
+        document.getElementById('voice-trigger-btn').classList.remove('active');
+        cancelAnimationFrame(animationId);
+        if (audioContext) audioContext.close();
+
+        const remoteDiv = document.querySelector('.remote');
+        if (remoteDiv) {
+            remoteDiv.style.background = "linear-gradient(145deg, #1a1a1a, #0f0f0f)";
+            remoteDiv.style.boxShadow = "0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)";
         }
 
-        // ------------------------------------
-	if (data.cmd === 'update-track') {
-    hasVotedCurrent = false;
-    const bUp = document.getElementById('btn-vote-up');
-    const bDown = document.getElementById('btn-vote-down');
-    
-    // Limpiamos bloqueo y colores previos
-    if(bUp) bUp.classList.remove('disabled', 'voted');
-    if(bDown) bDown.classList.remove('disabled', 'voted');
+        setTimeout(() => {
+            const marquee = document.getElementById('current-track-name');
+            marquee.style.animation = 'marquee-led 10s linear infinite';
+            marquee.style.paddingLeft = '100%';
+        }, 2000);
+    };
 
-    const trackDisplay = document.getElementById('current-track-name');
-    if (trackDisplay && data.title && data.artist) {
-        trackDisplay.innerText = `${data.artist} - ${data.title}`.toUpperCase();
+    function processVote(type) {
+        if (hasVotedCurrent) return;
+        hasVotedCurrent = true;
+        const btnUp = document.getElementById('btn-vote-up');
+        const btnDown = document.getElementById('btn-vote-down');
+        type === 'up' ? btnUp.classList.add('voted') : btnDown.classList.add('voted');
+        btnUp.classList.add('disabled');
+        btnDown.classList.add('disabled');
+        socket.emit('enviar-comando', { cmd: 'vote', voteType: type, room: roomID });
     }
-}
-        });
+
+	// --- FUNCIÓN DE LOGROS PAGINADOS (TRASPLANTADO) ---
 	let currentAchPageRemote = 0;
 
         function renderAchievementsRemote(achList) {
@@ -938,37 +1082,6 @@ if (data.cmd === 'update-user-data') {
                 pagination.appendChild(dot);
             }
         }
-
-	function processVote(type) {
-    if (hasVotedCurrent) return;
-
-    // 1. Bloqueo de seguridad
-    hasVotedCurrent = true;
-    const btnUp = document.getElementById('btn-vote-up');
-    const btnDown = document.getElementById('btn-vote-down');
-
-    // 2. Pintar el botón que tocaste y bloquear ambos
-    if (type === 'up') {
-        btnUp.classList.add('voted');
-    } else {
-        btnDown.classList.add('voted');
-    }
-
-    btnUp.classList.add('disabled');
-    btnDown.classList.add('disabled');
-
-    // 3. Vibración y envío a PC
-    if (navigator.vibrate) {
-        type === 'up' ? navigator.vibrate([40, 30, 40]) : navigator.vibrate(100);
-    }
-
-    socket.emit('enviar-comando', { 
-        cmd: 'vote', 
-        voteType: type, 
-        room: roomID 
-    });
-}	
-
     </script>
 </body>
 </html>
