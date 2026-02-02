@@ -934,15 +934,24 @@ async function startVoiceControl() {
         return;
     }
     
-    document.getElementById('voice-trigger-btn').classList.add('active');
-    
-    const marquee = document.getElementById('current-track-name');
-    marquee.style.animation = 'none';
-    marquee.style.paddingLeft = '0';
-    marquee.innerText = "LISTENING...";
-
     try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        document.getElementById('voice-trigger-btn').classList.add('active');
+        
+        const marquee = document.getElementById('current-track-name');
+        marquee.style.animation = 'none';
+        marquee.style.paddingLeft = '0';
+        marquee.innerText = "LISTENING...";
+
         recognition.start();
+        visualize();
     } catch(e) {
         alert("Error: " + e.message);
     }
@@ -956,17 +965,76 @@ recognition.onresult = (event) => {
         const marquee = document.getElementById('current-track-name');
         marquee.innerText = ">> " + transcript.toUpperCase();
         
-        if (command.includes("siguiente") || command.includes("next") || command.includes("sig")) {
+        if (command.includes("siguiente") || command.includes("next")) {
             send('next');
             marquee.innerText = "✓ NEXT";
         }
-        else if (command.includes("anterior") || command.includes("previous") || command.includes("back") || command.includes("atrás")) {
+        else if (command.includes("anterior") || command.includes("atrás") || command.includes("previous")) {
             send('prev');
             marquee.innerText = "✓ PREV";
         }
-        else if (command.includes("pausa") || command.includes("pause") || command.includes("stop") || command.includes("pausar")) {
+        else if (command.includes("pausa") || command.includes("pausar") || command.includes("pause")) {
             send('pause');
             marquee.innerText = "✓ PAUSE";
+        }
+        else if (command.includes("reproducir") || command.includes("play") || command.includes("reproduce")) {
+            send('pause');
+            marquee.innerText = "✓ PLAY";
+        }
+        else if (command.includes("subir volumen") || command.includes("más volumen")) {
+            send('vol-up');
+            marquee.innerText = "✓ VOL +";
+        }
+        else if (command.includes("bajar volumen") || command.includes("menos volumen")) {
+            send('vol-down');
+            marquee.innerText = "✓ VOL -";
+        }
+        else if (command.includes("escape") || command.includes("salir") || command.includes("cerrar")) {
+            send('esc');
+            marquee.innerText = "✓ ESC";
+        }
+        else if (command.includes("me gusta") || command.includes("like") || command.includes("pulgar arriba")) {
+            processVote('up');
+            marquee.innerText = "✓ LIKE";
+        }
+        else if (command.includes("no me gusta") || command.includes("dislike") || command.includes("pulgar abajo")) {
+            processVote('down');
+            marquee.innerText = "✓ DISLIKE";
+        }
+        else if (command.includes("agregar favorito") || command.includes("añadir favorito") || command.includes("favorito")) {
+            toggleFavLocal();
+            marquee.innerText = "✓ FAV";
+        }
+        else if (command.includes("lista favoritos") || command.includes("ver favoritos") || command.includes("mostrar favoritos")) {
+            send('fav-menu');
+            marquee.innerText = "✓ FAV LIST";
+        }
+        else if (command.includes("estadísticas") || command.includes("stats")) {
+            send('stats');
+            switchTab('stats');
+            marquee.innerText = "✓ STATS";
+        }
+        else if (command.includes("logros") || command.includes("awards") || command.includes("achievements")) {
+            send('achievements');
+            switchTab('achievements');
+            marquee.innerText = "✓ AWARDS";
+        }
+        else if (command.includes("recompensas") || command.includes("bóveda") || command.includes("vault")) {
+            send('rewards');
+            switchTab('vault');
+            marquee.innerText = "✓ VAULT";
+        }
+        else if (command.includes("muro") || command.includes("wall") || command.includes("mensaje")) {
+            openKeyboard();
+            marquee.innerText = "✓ WALL";
+        }
+        else if (command.includes("compartir") || command.includes("share")) {
+            send('share');
+            marquee.innerText = "✓ SHARE";
+        }
+        else if (command.includes("ocultar") || command.includes("minimizar") || command.includes("hide")) {
+            send('minimize');
+            marquee.innerText = "✓ HIDE";
         }
 };
 
