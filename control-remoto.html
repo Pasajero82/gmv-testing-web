@@ -928,27 +928,24 @@ if (SpeechRecognition) {
         animationId = requestAnimationFrame(visualize);
     }
 
-    async function startVoiceControl() {
-	alert("Botón presionado!");
-        if (!recognition) {
-            alert('Tu navegador no soporta reconocimiento de voz');
-            return;
-        }
+async function startVoiceControl() {
+    if (!recognition) {
+        alert('Tu navegador no soporta reconocimiento de voz');
+        return;
+    }
+    
+    document.getElementById('voice-trigger-btn').classList.add('active');
+    
+    const marquee = document.getElementById('current-track-name');
+    marquee.style.animation = 'none';
+    marquee.style.paddingLeft = '0';
+    marquee.innerText = "LISTENING...";
 
-
-
-            document.getElementById('voice-trigger-btn').classList.add('active');
-            
-            const marquee = document.getElementById('current-track-name');
-            marquee.style.animation = 'none';
-            marquee.style.paddingLeft = '0';
-            marquee.innerText = "LISTENING...";
-
-            try {
-    recognition.start();
-    alert("Micrófono iniciado - HABLA AHORA");
-  
-} 
+    try {
+        recognition.start();
+    } catch(e) {
+        alert("Error: " + e.message);
+    }
 }
         } catch (err) { 
             console.error('Error al acceder al micrófono:', err);
