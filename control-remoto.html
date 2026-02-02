@@ -1049,7 +1049,13 @@ function visualize() {
     }
     let average = sum / dataArray.length;
     // Esto mueve los colores según tu voz
-    document.body.style.background = `hsl(${280 + average}, 70%, ${average / 4}%)`;
+    // Buscamos el cuadro gris (el mando)
+    const remoteDiv = document.querySelector('.remote');
+    if (remoteDiv) {
+        // En lugar de cambiar el fondo, le damos un brillo interno que se mueva con tu voz
+        remoteDiv.style.backgroundColor = `hsl(${280 + average}, 30%, ${10 + average / 5}%)`;
+        remoteDiv.style.boxShadow = `0 20px 60px rgba(0,0,0,0.6), 0 0 ${average/2}px hsl(${280 + average}, 70%, 50%)`;
+    }
     animationId = requestAnimationFrame(visualize);
 }
 
@@ -1079,6 +1085,8 @@ recognition.onresult = (event) => {
     // Convertimos lo que dijiste a letras y lo ponemos en minúsculas
     const command = event.results[0][0].transcript.toLowerCase();
     console.log("Command received:", command);
+    // Esto escribirá en tu marquesina azul lo que el micro entendió
+    document.getElementById('current-track-name').innerText = "HEARD: " + command.toUpperCase();
 
     // Lógica de comandos: Si dices la palabra, se ejecuta la función
     if (command.includes("stats")) {
@@ -1117,7 +1125,12 @@ recognition.onend = () => {
     if (audioContext) audioContext.close();
     
     // Fondo negro de vuelta
-    document.body.style.background = "#0a0a0a";
+    const remoteDiv = document.querySelector('.remote');
+    if (remoteDiv) {
+        // Regresa a tu gradiente y sombra original
+        remoteDiv.style.background = "linear-gradient(145deg, #1a1a1a, #0f0f0f)";
+        remoteDiv.style.boxShadow = "0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)";
+    }
     console.log("Visualizer OFF");
 };
     </script>
