@@ -964,33 +964,10 @@ recognition.onresult = (event) => {
 };
 
 recognition.onerror = (event) => {
-    alert("ERROR DE VOZ: " + event.error);
     const marquee = document.getElementById('current-track-name');
     marquee.innerText = "ERROR: " + event.error.toUpperCase();
 };
-recognition.onspeechstart = () => {
-    alert("DETECTÉ QUE EMPEZASTE A HABLAR!");
-};
 
-recognition.onspeechend = () => {
-    alert("DETECTÉ QUE DEJASTE DE HABLAR!");
-};
-
-recognition.onnomatch = () => {
-    alert("NO MATCH");
-    recognition.stop();
-};
-
-recognition.onsoundstart = () => {
-    alert("DETECTÉ SONIDO!");
-};
-recognition.onaudiostart = () => {
-    alert("AUDIO INICIADO - HABLA MUY FUERTE AHORA!");
-};
-
-recognition.onaudioend = () => {
-    alert("AUDIO TERMINADO");
-};
     recognition.onend = () => {
         document.getElementById('voice-trigger-btn').classList.remove('active');
         cancelAnimationFrame(animationId);
