@@ -2261,7 +2261,7 @@ body.clean-mode .promo-card {
         </button>
     </div>
 
-</div> </div> <div id="achievements-panel">
+</div> <div id="achievements-panel">
     <div class="ach-header">
         <div class="ach-title">🏆 ACHIEVEMENTS</div>
         <div class="ach-counter" id="ach-counter">0/10</div>
@@ -4284,8 +4284,7 @@ socket.on('ejecutar-comando', (data) => {
                 );
 
                 if (coincidencias.length > 0) {
-                    // Si hay varias canciones, elige una al azar
-                    const elegido = coincidencias[Math.floor(Math.random() * coincidencias.length)];
+                   const elegido = coincidencias[Math.floor(Math.random() * coincidencias.length)];
                     
                     showSystemMessage("🔍 ENCONTRADO: " + elegido.artist.toUpperCase());
                     playSpecificVideo(elegido, true); 
