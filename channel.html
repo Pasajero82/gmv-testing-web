@@ -388,20 +388,20 @@ body {
 /* Botones superiores - Diseño moderno */
 .top-buttons-group {
     position: absolute;
-    top: 50%; /* Lo centramos verticalmente */
-    right: var(--space-md); /* Un pequeño margen a la derecha para que no se pegue al borde */
-    transform: translateY(-50%); /* Ajuste fino del centrado vertical */
+    top: 50%;
+    right: 15px; 
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     z-index: 65;
-    transition: transform var(--transition-slow), box-shadow var(--transition-base);
 
-    /* --- ESTILO PASTILLA ROSA --- */
-    background: var(--primary); /* El rosa neón intenso */
-    border-radius: 50px;         /* Forma de óvalo/pastilla */
-    padding: 4px;                /* Un pequeño respiro interno */
-    box-shadow: 0 4px 12px var(--primary-glow); /* Resplandor neón suave */
-    border: 1px solid rgba(255,255,255,0.1); /* Borde sutil para definición */
+    /* --- ESTILO LIMPIO --- */
+    background: #ff0066; /* El rosa de tus letras (Mexican Neon Pink) */
+    height: 38px;        /* Altura justa para cubrir el texto */
+    border-radius: 19px; /* Mitad de la altura para el óvalo perfecto */
+    padding: 0 8px;      /* Espacio interno a los lados */
+    box-shadow: none;    /* CERO EFECTO GLOW */
+    border: none;
 }
 
 /* Efecto de "latido" al pasar el mouse por encima de todo el grupo */
@@ -410,26 +410,24 @@ body {
 }
 
 .fav-menu-btn-top, .qr-btn-top {
-    height: 34px; /* Altura fija más pequeña para caber en el óvalo */
-    width: 38px;  /* Anchura fija para que sean uniformes */
-    padding: 0;   /* Quitamos el padding lateral antiguo */
+    height: 38px;
+    width: 42px;
     background: transparent;
-    color: var(--text-primary); /* Iconos BLANCOS */
-    cursor: pointer;
+    color: #ffffff; /* Iconos en blanco para máximo contraste */
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none; /* Sin bordes entre ellos */
-    font-size: 1.1rem; /* Tamaño de icono ajustado */
-    transition: all var(--transition-base);
-    border-radius: 50px; /* Redondeados por si acaso */
-    position: relative;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
 
-/* ELIMINAR la línea rosa antigua */
-.fav-menu-btn-top::before,
-.qr-btn-top::before {
-    display: none;
+/* Efecto simple de opacidad en lugar de recuadros o brillos */
+.fav-menu-btn-top:hover,
+.qr-btn-top:hover {
+    opacity: 0.7;
+    background: transparent !important;
 }
 
 /* Nuevo efecto hover para los botones individuales: un ligero brillo blanco */
