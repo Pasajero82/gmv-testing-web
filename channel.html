@@ -2158,13 +2158,14 @@ body.clean-mode .promo-card {
     display: flex;
     flex-direction: column;
     transition: opacity 0.3s ease;
+    transform: translateY(0);
 }
 
 .custom-shelf.hidden { 
-    /* USAMOS TU VARIABLE: Para que deslice igual que Favoritos y Recompensas */
+    transform: translateY(100%); 
     transition: transform var(--transition-slow), opacity var(--transition-slow);
     
-    transform: translateY(100%); 
+    
     opacity: 0; 
     pointer-events: none; 
 }
