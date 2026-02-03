@@ -2158,12 +2158,10 @@ body.clean-mode .promo-card {
     display: flex;
     flex-direction: column;
     transition: opacity 0.3s ease;
-    transform: translateY(0);
 }
 
-.custom-shelf.off-screen {
+.custom-shelf.hidden { 
     transform: translateY(100%); 
-    transition: transform var(--transition-slow), opacity var(--transition-slow);   
     opacity: 0; 
     pointer-events: none; 
 }
@@ -3797,23 +3795,20 @@ document.addEventListener('DOMContentLoaded', function() {
 function onPlayerStateChange(event) {
     const shelf = document.getElementById('custom-pause-shelf');
 
-    // 1. Al pausar: aparece de inmediato
     if (event.data === YT.PlayerState.PAUSED) {
         populateCustomShelf();
-        if (shelf) shelf.classList.remove('off-screen');
+        if (shelf) shelf.classList.remove('hidden');
         
         document.activeElement.blur(); 
         window.focus(); 
         document.getElementById('playPauseBtn').innerHTML = "▶";
     } 
-    // 2. Al dar Play: la clase 'hidden' activa la animación de 1 segundo hacia abajo
     else if (event.data === YT.PlayerState.PLAYING) {
-        if (shelf) shelf.classList.add('off-screen');
+        if (shelf) shelf.classList.add('hidden');
         document.getElementById('playPauseBtn').innerHTML = "⏸";
     }
-    // 3. Otros estados (cargando o fin de video)
     else {
-        if (shelf) shelf.classList.add('off-screen');
+        if (shelf) shelf.classList.add('hidden');
         if (event.data === YT.PlayerState.ENDED) playNextVideo();
     }
 }
