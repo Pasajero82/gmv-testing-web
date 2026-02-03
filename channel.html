@@ -345,6 +345,7 @@ body {
 }
 
 /* --- BARRA SUPERIOR (GLASSMORPHISM) --- */
+/* 1. La barra gris se mantiene sólida y perfecta de lado a lado */
 .marquee-container { 
     position: absolute; 
     top: 0; 
@@ -356,15 +357,29 @@ body {
     z-index: 60; 
     overflow: hidden; 
     display: flex; 
-    align-items: center;
+    align-items: center; /* Ayuda al centrado base */
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 
+/* 2. La ventana que define dónde 'nace' el texto (antes de los botones) */
+.marquee-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Ajusta este valor (130px) si el texto sale muy lejos o muy cerca de la estrella */
+    right: 130px; 
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 3. Centrado vertical y corrección de texto cortado */
 .marquee-content { 
     display: inline-block; 
     white-space: nowrap; 
     padding-left: 100%; 
+    /* Agregamos un poco de espacio al final para que no se corte la última letra */
+    padding-right: 50px; 
     animation: marquee 80s linear infinite;
     font-family: inherit;
     font-size: 1.06rem; 
@@ -372,8 +387,9 @@ body {
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 1px;
-    -webkit-mask-image: linear-gradient(to left, transparent 135px, black 135px);
-    mask-image: linear-gradient(to left, transparent 135px, black 135px);
+    
+    /* ESTO CORRIGE EL CENTRADO VERTICAL: debe ser igual a la altura de la barra */
+    line-height: 60px; 
 }
 
 .marquee-content span { 
@@ -2186,7 +2202,7 @@ body.clean-mode .promo-card {
         <div class="crt-effect"></div>
 
 <div class="marquee-container" id="tickerBar">
-    <div class="marquee-viewport" style="position: absolute; top: 0; left: 0; right: 140px; height: 100%; overflow: hidden;">
+    <div class="marquee-viewport">
         <div class="marquee-content" id="newsTicker"></div>
     </div>
 
