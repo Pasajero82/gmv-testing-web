@@ -388,53 +388,51 @@ body {
 /* Botones superiores - Diseño moderno */
 .top-buttons-group {
     position: absolute;
-    top: 50%;
-    right: 15px; 
-    transform: translateY(-50%);
+    top: 0;
+    right: 0;
     display: flex;
-    align-items: center;
+    height: 56px;
     z-index: 65;
-
-    /* --- ESTILO LIMPIO --- */
-    background: #ff0066; /* El rosa de tus letras (Mexican Neon Pink) */
-    height: 38px;        /* Altura justa para cubrir el texto */
-    border-radius: 19px; /* Mitad de la altura para el óvalo perfecto */
-    padding: 0 8px;      /* Espacio interno a los lados */
-    box-shadow: none;    /* CERO EFECTO GLOW */
-    border: none;
-}
-
-/* Efecto de "latido" al pasar el mouse por encima de todo el grupo */
-.top-buttons-group:hover {
-    box-shadow: 0 0 20px var(--primary-glow);
+    transition: transform var(--transition-slow);
 }
 
 .fav-menu-btn-top, .qr-btn-top {
-    height: 38px;
-    width: 42px;
+    height: 56px;
     background: transparent;
-    color: #ffffff; /* Iconos en blanco para máximo contraste */
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0 var(--space-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: opacity 0.2s;
+    border-left: 1px solid var(--border-subtle);
+    font-size: 1.25rem;
+    transition: all var(--transition-base);
+    position: relative;
 }
 
-/* Efecto simple de opacidad en lugar de recuadros o brillos */
-.fav-menu-btn-top:hover,
-.qr-btn-top:hover {
-    opacity: 0.7;
-    background: transparent !important;
+.fav-menu-btn-top::before,
+.qr-btn-top::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transition: transform var(--transition-base);
 }
 
-/* Nuevo efecto hover para los botones individuales: un ligero brillo blanco */
 .fav-menu-btn-top:hover,
 .qr-btn-top:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: rgba(99, 102, 241, 0.08);
+    color: var(--primary);
+}
+
+.fav-menu-btn-top:hover::before,
+.qr-btn-top:hover::before {
+    transform: scaleX(1);
 }
 
 .qr-btn-top svg {
