@@ -372,6 +372,8 @@ body {
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 1px;
+    -webkit-mask-image: linear-gradient(to left, transparent 135px, black 135px);
+    mask-image: linear-gradient(to left, transparent 135px, black 135px);
 }
 
 .marquee-content span { 
@@ -391,7 +393,7 @@ body {
     top: 0;
     right: 0;
     display: flex;
-    height: 56px;
+    height: 60px;
     z-index: 65;
     transition: transform var(--transition-slow);
 }
@@ -426,7 +428,7 @@ body {
 
 .fav-menu-btn-top:hover,
 .qr-btn-top:hover {
-    background: rgba(99, 102, 241, 0.08);
+    background: transparent !important;
     color: var(--primary);
 }
 
@@ -2182,8 +2184,12 @@ body.clean-mode .promo-card {
         <div class="vignette"></div>
         <div class="scanlines"></div>
         <div class="crt-effect"></div>
-	<div class="marquee-container" id="tickerBar">
-    <div class="marquee-content" id="newsTicker"></div>
+
+<div class="marquee-container" id="tickerBar">
+    <div class="marquee-viewport" style="position: absolute; top: 0; left: 0; right: 140px; height: 100%; overflow: hidden;">
+        <div class="marquee-content" id="newsTicker"></div>
+    </div>
+
     <div class="top-buttons-group">
         <div class="qr-btn-top" onclick="toggleQRDesdeIcono()" title="Mostrar QR">
             <svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2 2h2v2h-2v-2zM13 15h2v2h-2v-2zm2 2h2v2h-2v-2zm0-4h2v2h-2v-2zm2 2h2v2h-2v-2z"/></svg>
