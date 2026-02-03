@@ -394,10 +394,8 @@ body {
     height: 56px;
     z-index: 65;
     transition: transform var(--transition-slow);
-    /* --- ESTO ES LO QUE NECESITAS --- */
-    background: #0f0f0f; /* Color sólido igual al fondo base para tapar el texto */
-    padding-left: 20px;   /* Crea un margen para que el texto no choque contra los botones */
-    box-shadow: -15px 0 20px #0f0f0f; /* Crea un degradado suave para que el texto se "desvanezca" */
+    /* Fondo sólido para tapar el texto de la marquesina */
+    background: #0f0f0f; 
 }
 
 .fav-menu-btn-top, .qr-btn-top {
@@ -430,7 +428,7 @@ body {
 
 .fav-menu-btn-top:hover,
 .qr-btn-top:hover {
-    background: rgba(99, 102, 241, 0.08);
+    background: transparent;
     color: var(--primary);
 }
 
