@@ -3791,33 +3791,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-	function onPlayerStateChange(event) {
+function onPlayerStateChange(event) {
     const shelf = document.getElementById('custom-pause-shelf');
 
-    // Detectamos la PAUSA
+    // 1. SOLO si el estado es exactamente PAUSA (2), mostramos la barra
     if (event.data === YT.PlayerState.PAUSED) {
-        populateCustomShelf(); // Llenamos la barra con tus videos al azar
-        if (shelf) shelf.classList.remove('hidden'); // Mostramos tu barra
+        populateCustomShelf(); // Llenamos con tus videos
+        if (shelf) shelf.classList.remove('hidden');
         
-        // Quitamos el foco de YouTube para que tus comandos sigan funcionando
         document.activeElement.blur(); 
         window.focus(); 
-        
-        // Cambiamos el icono del botón inferior a PLAY
         document.getElementById('playPauseBtn').innerHTML = "▶";
     } 
-    // Detectamos cuando vuelve el PLAY
-    else if (event.data === YT.PlayerState.PLAYING) {
-        if (shelf) shelf.classList.add('hidden'); // Escondemos tu barra de inmediato
-        document.getElementById('playPauseBtn').innerHTML = "⏸";
-    }
-    
-    // Si el video termina, pasa al siguiente canal
-    if (event.data === YT.PlayerState.ENDED) {
+    // 2. Para CUALQUIER otro estado (Cargando, Iniciando, Play, Terminado), la ocultamos de inmediato
+    else {
         if (shelf) shelf.classList.add('hidden');
-        playNextVideo();
+        
+        // Si está en PLAY, actualizamos el icono del botón inferior
+        if (event.data === YT.PlayerState.PLAYING) {
+            document.getElementById('playPauseBtn').innerHTML = "⏸";
+        }
+        
+        // Si el video terminó, pasamos al siguiente
+        if (event.data === YT.PlayerState.ENDED) {
+            playNextVideo();
+        }
     }
 }
+
 // Esta función elige 6 videos al azar de tu playlist.js para mostrarlos en la pausa
 function populateCustomShelf() {
     const container = document.getElementById('shelf-items-container');
