@@ -3800,7 +3800,7 @@ function onPlayerStateChange(event) {
     // 1. Al pausar: aparece de inmediato
     if (event.data === YT.PlayerState.PAUSED) {
         populateCustomShelf();
-        if (shelf) shelf.classList.remove('hidden');
+        if (shelf) shelf.classList.remove('off-screen');
         
         document.activeElement.blur(); 
         window.focus(); 
@@ -3808,12 +3808,12 @@ function onPlayerStateChange(event) {
     } 
     // 2. Al dar Play: la clase 'hidden' activa la animación de 1 segundo hacia abajo
     else if (event.data === YT.PlayerState.PLAYING) {
-        if (shelf) shelf.classList.add('hidden');
+        if (shelf) shelf.classList.add('off-screen');
         document.getElementById('playPauseBtn').innerHTML = "⏸";
     }
     // 3. Otros estados (cargando o fin de video)
     else {
-        if (shelf) shelf.classList.add('hidden');
+        if (shelf) shelf.classList.add('off-screen');
         if (event.data === YT.PlayerState.ENDED) playNextVideo();
     }
 }
