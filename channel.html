@@ -2161,8 +2161,16 @@ body.clean-mode .promo-card {
 }
 
 .custom-shelf.hidden { 
-    transform: translateY(100%); 
+    /* 1. Quitamos cualquier rastro de movimiento */
+    transform: none; 
+
+    /* 2. Definimos cuánto quieres que tarde en desaparecer (ejemplo: 2 segundos) */
+    transition: opacity 2s ease; 
     opacity: 0; 
+
+    /* 3. Evitamos que la regla global de la línea 892 la apague de golpe */
+    visibility: visible !important; 
+    
     pointer-events: none; 
 }
 
