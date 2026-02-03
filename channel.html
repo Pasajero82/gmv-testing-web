@@ -2161,16 +2161,14 @@ body.clean-mode .promo-card {
 }
 
 .custom-shelf.hidden { 
-    /* 1. Quitamos cualquier rastro de movimiento */
-    transform: none; 
-
-    /* 2. Definimos cuánto quieres que tarde en desaparecer (ejemplo: 2 segundos) */
-    transition: opacity 2s ease; 
-    opacity: 0; 
-
-    /* 3. Evitamos que la regla global de la línea 892 la apague de golpe */
-    visibility: visible !important; 
+    /* 2. EL SECRETO: Forzamos que la barra se quede sólida 0.8 segundos */
+    /* y luego desaparezca de golpe (0s de duración) */
+    transition: opacity 0s 0.8s, visibility 0s 0.8s;
     
+    opacity: 0; 
+    visibility: hidden !important; /* Ganamos al apagón global */
+    
+    transform: none; 
     pointer-events: none; 
 }
 
