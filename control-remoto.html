@@ -1022,7 +1022,6 @@ recognition.onresult = (event) => {
 
     // 9. BÚSQUEDA POR VOZ (SI NO ES NADA DE LO ANTERIOR)
     else {
-else {
         let queryLimpia = command
             .replace(/^pon a /i, "")
             .replace(/^pon /i, "")
@@ -1038,6 +1037,7 @@ else {
             query: queryLimpia, 
             room: roomID 
         });
+      }
     }
 };
 
