@@ -388,61 +388,55 @@ body {
 /* Botones superiores - Diseño moderno */
 .top-buttons-group {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 50%; /* Lo centramos verticalmente */
+    right: var(--space-md); /* Un pequeño margen a la derecha para que no se pegue al borde */
+    transform: translateY(-50%); /* Ajuste fino del centrado vertical */
     display: flex;
-    height: 60px;
+    align-items: center;
     z-index: 65;
-    transition: transform var(--transition-slow);
-    
-    /* 1. Color sólido para tapar las letras (Gris elevado de tu paleta) */
-    background: #1a1a1a; 
-    
-    /* 2. El TRUCO: Un degradado hacia la izquierda para que no haya un corte seco */
-    /* Esto hace que el texto se desvanezca gradualmente antes de tocar los botones */
-    box-shadow: -40px 0 40px #1a1a1a; 
-    
-    /* 3. Quitamos cualquier borde para que parezca la misma pieza */
-    border: none;
+    transition: transform var(--transition-slow), box-shadow var(--transition-base);
+
+    /* --- ESTILO PASTILLA ROSA --- */
+    background: var(--primary); /* El rosa neón intenso */
+    border-radius: 50px;         /* Forma de óvalo/pastilla */
+    padding: 4px;                /* Un pequeño respiro interno */
+    box-shadow: 0 4px 12px var(--primary-glow); /* Resplandor neón suave */
+    border: 1px solid rgba(255,255,255,0.1); /* Borde sutil para definición */
+}
+
+/* Efecto de "latido" al pasar el mouse por encima de todo el grupo */
+.top-buttons-group:hover {
+    box-shadow: 0 0 20px var(--primary-glow);
 }
 
 .fav-menu-btn-top, .qr-btn-top {
-    height: 60px;
+    height: 34px; /* Altura fija más pequeña para caber en el óvalo */
+    width: 38px;  /* Anchura fija para que sean uniformes */
+    padding: 0;   /* Quitamos el padding lateral antiguo */
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--text-primary); /* Iconos BLANCOS */
     cursor: pointer;
-    padding: 0 var(--space-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-left: 1px solid var(--border-subtle);
-    font-size: 1.25rem;
+    border: none; /* Sin bordes entre ellos */
+    font-size: 1.1rem; /* Tamaño de icono ajustado */
     transition: all var(--transition-base);
+    border-radius: 50px; /* Redondeados por si acaso */
     position: relative;
 }
 
+/* ELIMINAR la línea rosa antigua */
 .fav-menu-btn-top::before,
 .qr-btn-top::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--primary);
-    transform: scaleX(0);
-    transition: transform var(--transition-base);
+    display: none;
 }
 
+/* Nuevo efecto hover para los botones individuales: un ligero brillo blanco */
 .fav-menu-btn-top:hover,
 .qr-btn-top:hover {
-    background: transparent;
-    color: var(--primary);
-}
-
-.fav-menu-btn-top:hover::before,
-.qr-btn-top:hover::before {
-    transform: scaleX(1);
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
 }
 
 .qr-btn-top svg {
