@@ -359,8 +359,6 @@ body {
     align-items: center;
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    -webkit-mask-image: linear-gradient(to right, black 0%, black 75%, transparent 90%);
-    mask-image: linear-gradient(to right, black 0%, black 75%, transparent 90%);
 }
 
 .marquee-content { 
@@ -374,6 +372,10 @@ body {
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 1px;
+
+    /* --- ESTO HACE QUE EL TEXTO DESAPAREZCA AL LLEGAR A LA DERECHA --- */
+    -webkit-mask-image: linear-gradient(to right, black 0%, black 80%, transparent 90%);
+    mask-image: linear-gradient(to right, black 0%, black 80%, transparent 90%);
 }
 
 .marquee-content span { 
