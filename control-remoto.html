@@ -1022,8 +1022,22 @@ recognition.onresult = (event) => {
 
     // 9. BÚSQUEDA POR VOZ (SI NO ES NADA DE LO ANTERIOR)
     else {
-        marquee.innerText = "🔍 " + transcript.toUpperCase();
-        socket.emit('enviar-comando', { cmd: 'voice-search', query: command, room: roomID });
+else {
+        let queryLimpia = command
+            .replace(/^pon a /i, "")
+            .replace(/^pon /i, "")
+            .replace(/^reproduce a /i, "")
+            .replace(/^reproduce /i, "")
+            .replace(/^escuchar a /i, "")
+            .replace(/^escuchar /i, "")
+            .trim();
+        
+        marquee.innerText = "🔍 " + queryLimpia.toUpperCase();
+        socket.emit('enviar-comando', { 
+            cmd: 'voice-search', 
+            query: queryLimpia, 
+            room: roomID 
+        });
     }
 };
 
