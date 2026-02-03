@@ -944,23 +944,22 @@ input[type=range]::-moz-range-thumb:hover {
 /* --- PANEL DE ESTADÍSTICAS --- */
 #stats-panel {
     position: absolute;
-    top: 76px;
+    top: 65px;
     left: var(--space-lg);
     background: var(--bg-glass);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
-    padding: 12px 16px;
+    padding: 10;
     z-index: 80;
-    width: 240px;
+    width: 260px;
     font-family: inherit;
     box-shadow: var(--shadow-xl);
     transform: translateY(-20px);
     opacity: 0;
     pointer-events: none;
     transition: all var(--transition-slow);
-    width: 320px;
 }
 
 #stats-panel.show {
@@ -974,7 +973,7 @@ input[type=range]::-moz-range-thumb:hover {
     font-family: inherit;
     font-size: 0.8rem;
     letter-spacing: 1px;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-weight: 700;
     border-bottom: 1px solid var(--border-subtle);
     padding-bottom: 5px;
@@ -983,8 +982,8 @@ input[type=range]::-moz-range-thumb:hover {
 
 .stat-line {
     color: var(--text-primary);
-    font-size: 0.9rem;
-    margin-bottom: 4px;
+    font-size: 0.8rem;
+    margin-bottom: 2px;
     line-height: 1.2;
     font-weight: 400;
     display: flex;
@@ -1003,7 +1002,7 @@ input[type=range]::-moz-range-thumb:hover {
 }
 
 .stats-artists {
-    margin-top: var(--space-lg);
+    margin-top: 8px;
     padding-top: var(--space-md);
     border-top: 1px solid var(--border-subtle);
 }
@@ -1012,14 +1011,14 @@ input[type=range]::-moz-range-thumb:hover {
     color: var(--secondary);
     font-size: 0.75rem;
     font-weight: 700;
-    margin-bottom: var(--space-md);
+    margin-bottom: 5px;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 .stats-artist-item {
     color: var(--text-secondary);
-    font-size: 0.813rem;
+    font-size: 0.75rem;
     margin-bottom: var(--space-sm);
     font-weight: 400;
     padding: var(--space-xs) 0;
@@ -1035,7 +1034,7 @@ input[type=range]::-moz-range-thumb:hover {
     background: transparent;
     border: 1px solid var(--border-default);
     color: var(--text-primary);
-    padding: var(--space-md);
+    padding: 8px;
     font-family: inherit;
     font-size: 0.75rem;
     font-weight: 700;
