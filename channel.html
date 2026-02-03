@@ -391,19 +391,19 @@ body {
     top: 0;
     right: 0;
     display: flex;
-    height: 60px; /* Altura idéntica a la marquesina */
+    height: 60px;
     z-index: 65;
     transition: transform var(--transition-slow);
     
-    /* Usamos tu variable original para que el color sea exacto */
-    background: var(--bg-glass); 
+    /* 1. Color sólido para tapar las letras (Gris elevado de tu paleta) */
+    background: #1a1a1a; 
     
-    /* Aplicamos el mismo desenfoque de tu marquesina para que el gris sea igual */
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    /* 2. El TRUCO: Un degradado hacia la izquierda para que no haya un corte seco */
+    /* Esto hace que el texto se desvanezca gradualmente antes de tocar los botones */
+    box-shadow: -40px 0 40px #1a1a1a; 
     
-    /* Borde sutil para que la unión sea perfecta */
-    border-left: 1px solid var(--border-subtle);
+    /* 3. Quitamos cualquier borde para que parezca la misma pieza */
+    border: none;
 }
 
 .fav-menu-btn-top, .qr-btn-top {
